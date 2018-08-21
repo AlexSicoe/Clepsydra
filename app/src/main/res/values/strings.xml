@@ -3,4 +3,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="startDate">Start date</string>
+    <string name="dateTimeFormat">MM/dd/yyyy HH:mm</string>
+    <string name="project_name">Project name</string>
+    <string name="projectAddSuccess">Project added succesfully!</string>
+    <string name="Error">Error!</string>
 </resources>

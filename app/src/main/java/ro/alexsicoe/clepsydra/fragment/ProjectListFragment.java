@@ -34,7 +34,6 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.activity.AddProjectActivity;
-import ro.alexsicoe.clepsydra.activity.ProjectListActivity;
 import ro.alexsicoe.clepsydra.model.Project;
 import ro.alexsicoe.clepsydra.model.RequestType;
 
@@ -42,7 +41,7 @@ public class ProjectListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String STR_PROJECT = "project";
     private static final String STR_INDEX = "index";
-    private static final String TAG = "ProjectListFragment";
+    private static final String TAG = ProjectListFragment.class.getSimpleName();
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     private int columnCount = 1;

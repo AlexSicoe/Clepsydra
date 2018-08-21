@@ -7,7 +7,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class DateFormatWrapper {
+public class DFWrapper {
     private static final String template = "MM/dd/yyyy HH:mm";
     private static DateFormat format;
 
