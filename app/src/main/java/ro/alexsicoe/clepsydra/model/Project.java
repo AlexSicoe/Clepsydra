@@ -14,6 +14,8 @@ public class Project implements Serializable {
     //private List<Milestone> milestones;
     //private List<User> users;
 
+    public Project() {
+    }
 
     public Project(@NonNull String name) {
         this.name = name;

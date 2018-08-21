@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "634604827221",
+    "firebase_url": "https://clepsydra-time-management.firebaseio.com",
+    "project_id": "clepsydra-time-management",
+    "storage_bucket": "clepsydra-time-management.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634604827221:android:bde7de0250a03391",
+        "android_client_info": {
+          "package_name": "ro.alexsicoe.clepsydra"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "634604827221-3l48meihmmka2uqervng986v3n848ijt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2fWKYYBeivfoDPk2MSdgHCggLeMOXuIc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
