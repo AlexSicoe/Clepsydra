@@ -17,28 +17,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-
-import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.activity.AddProjectActivity;
-import ro.alexsicoe.clepsydra.model.Project;
-import ro.alexsicoe.clepsydra.model.RequestType;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
+import ro.alexsicoe.clepsydra.R;
+import ro.alexsicoe.clepsydra.activity.AddProjectActivity;
+import ro.alexsicoe.clepsydra.model.Project;
+import ro.alexsicoe.clepsydra.model.RequestType;
 
 public class ProjectListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String STR_PROJECT = "project";
     private static final String STR_INDEX = "index";
-    private int columnCount = 1;
-    private List<Project> projects;
+    @Nullable
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-
+    private int columnCount = 1;
+    private List<Project> projects;
+    private Unbinder unbinder;
 
     public static ProjectListFragment newInstance(int columnCount) {
         ProjectListFragment fragment = new ProjectListFragment();
@@ -77,6 +77,12 @@ public class ProjectListFragment extends Fragment {
         );
         initItemTouchHelper();
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @OnClick(R.id.fab)
