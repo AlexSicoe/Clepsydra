@@ -7,5 +7,7 @@
     <string name="dateTimeFormat">MM/dd/yyyy HH:mm</string>
     <string name="project_name">Project name</string>
     <string name="projectAddSuccess">Project added succesfully!</string>
-    <string name="Error">Error!</string>
+    <string name="error">Some error</string>
+    <string name="textview">TextView</string>
+    <string name="listitem">listItem</string>
 </resources>

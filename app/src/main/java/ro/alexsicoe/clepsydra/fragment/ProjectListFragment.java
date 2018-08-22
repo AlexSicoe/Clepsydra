@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -47,6 +46,8 @@ public class ProjectListFragment extends Fragment {
     private int columnCount = 1;
     private List<Project> projects;
     private Unbinder unbinder;
+    private FirebaseFirestore db;
+
 
     public static ProjectListFragment newInstance(int columnCount) {
         ProjectListFragment fragment = new ProjectListFragment();
@@ -72,42 +73,49 @@ public class ProjectListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_project_list, container, false);
         final Context context = view.getContext();
         unbinder = ButterKnife.bind(this, view);
-        projects = new ArrayList<>();
-        queryAllProjects();
         initLayoutManager(context);
-        recyclerView.setAdapter(new ProjectRecyclerViewAdapter(projects, new OnItemClickListener() {
-                    @Override
-                    public void onClickItem(Project project, int index) {
-                        //TODO start ProjectActivity
-                        Toast.makeText(context, project.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                })
-        );
+
+        db = FirebaseFirestore.getInstance();
+
+        queryAllProjects();
+
+
         initItemTouchHelper();
         return view;
     }
 
     private void queryAllProjects() {
-        //TODO check that logged user is manager of/invited into project
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference projectsCollectionRef = db.collection("projects");
-        projectsCollectionRef
+        projects = new ArrayList<>();
+        db.collection("projects")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
                                 Project project = document.toObject(Project.class);
                                 projects.add(project);
+                                setProjectRecyclerViewAdapter();
                             }
+                            //
                         } else {
                             Log.d(TAG, "Error getting document: ", task.getException());
+                            Toast.makeText(getContext(), R.string.error, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+    }
 
-
+    private void setProjectRecyclerViewAdapter() {
+        recyclerView.setAdapter(new ProjectRecyclerViewAdapter(projects, new OnItemClickListener() {
+                    @Override
+                    public void onClickItem(Project project, int index) {
+                        //TODO start ProjectActivity
+                        Toast.makeText(getContext(), project.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+        );
     }
 
     @Override

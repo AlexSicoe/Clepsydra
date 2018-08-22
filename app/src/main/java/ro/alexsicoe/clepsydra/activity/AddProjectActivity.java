@@ -76,7 +76,7 @@ public class AddProjectActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w(TAG, "Error adding document", e);
-                        Toast.makeText(AddProjectActivity.this, R.string.Error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddProjectActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
                     }
                 });
     }

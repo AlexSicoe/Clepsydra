@@ -18,9 +18,22 @@ class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecyclerVie
     private final List<Project> items;
     private final ProjectListFragment.OnItemClickListener listener;
 
-    public ProjectRecyclerViewAdapter(List<Project> items, ProjectListFragment.OnItemClickListener listener) {
+    ProjectRecyclerViewAdapter(List<Project> items, ProjectListFragment.OnItemClickListener listener) {
         this.items = items;
         this.listener = listener;
+    }
+
+    @Override
+    public int getItemCount() {
+        return items.size();
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.fragment_project_list_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -35,20 +48,6 @@ class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecyclerVie
                 }
             }
         });
-    }
-
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_project_list_item, parent, false);
-        return new ViewHolder(view);
-    }
-
-
-    @Override
-    public int getItemCount() {
-        return items.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -66,6 +65,7 @@ class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecyclerVie
         public String toString() {
             return super.toString() + " '" + tvProjectName.getText() + "'";
         }
+
 
     }
 }

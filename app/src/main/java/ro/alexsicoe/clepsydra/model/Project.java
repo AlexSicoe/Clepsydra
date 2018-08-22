@@ -1,15 +1,15 @@
 package ro.alexsicoe.clepsydra.model;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class Project implements Serializable {
+public class Project implements Serializable, Cloneable {
 
-    @NonNull
+
     private String name;
-    @NonNull
     private Date start;
     //private List<Milestone> milestones;
     //private List<User> users;
@@ -44,5 +44,18 @@ public class Project implements Serializable {
 
     public void setStart(@NonNull Date start) {
         this.start = start;
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "name='" + name + '\'' +
+                ", start=" + start +
+                '}';
+    }
+
+    @Override
+    public Project clone() throws CloneNotSupportedException {
+        return (Project)super.clone();
     }
 }
