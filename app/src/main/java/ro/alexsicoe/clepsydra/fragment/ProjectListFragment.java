@@ -26,6 +26,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,6 +86,8 @@ public class ProjectListFragment extends Fragment {
     }
 
     private void queryAllProjects() {
+        //TODO user is part of project
+
         projects = new ArrayList<>();
         db.collection("projects")
                 .get()

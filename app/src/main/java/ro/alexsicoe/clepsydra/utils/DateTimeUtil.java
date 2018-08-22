@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.model;
+package ro.alexsicoe.clepsydra.utils;
 
 
 import android.content.Context;
@@ -7,9 +7,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class DFWrapper {
+public final class DateTimeUtil {
     private static final String template = "MM/dd/yyyy HH:mm";
     private static DateFormat format;
+
+    private DateTimeUtil() {
+    }
 
     public static DateFormat getFormat() {
         return format;

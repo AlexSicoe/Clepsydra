@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.model.DFWrapper;
+import ro.alexsicoe.clepsydra.utils.DateTimeUtil;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        DFWrapper.setFormat(this);
+        DateTimeUtil.setFormat(this);
     }
 
     @OnClick(R.id.btnProjects)

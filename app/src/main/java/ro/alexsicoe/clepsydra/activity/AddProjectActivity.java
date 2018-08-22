@@ -21,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.model.DFWrapper;
+import ro.alexsicoe.clepsydra.utils.DateTimeUtil;
 import ro.alexsicoe.clepsydra.model.Project;
 
 public class AddProjectActivity extends AppCompatActivity {
@@ -51,14 +51,15 @@ public class AddProjectActivity extends AppCompatActivity {
         Date startDate = null;
         try {
             startDate =
-                    DFWrapper.getFormat().parse(
+                    DateTimeUtil.getFormat().parse(
                             etStartDate.getText().toString());
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         assert startDate != null;
-        Project project = new Project(name, startDate);
+        //TODO change johnDoe to logged user id
+        Project project = new Project(name, "JohnDoe", startDate);
         addToDB(project);
         finish();
     }

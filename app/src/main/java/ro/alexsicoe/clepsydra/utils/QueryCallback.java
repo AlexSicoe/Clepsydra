@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.firestore.utils;
+package ro.alexsicoe.clepsydra.utils;
 
 public interface QueryCallback {
     void onCallback();
