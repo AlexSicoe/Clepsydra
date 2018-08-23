@@ -21,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.utils.DateTimeUtil;
+import ro.alexsicoe.clepsydra.util.DateTimeUtil;
 import ro.alexsicoe.clepsydra.model.Project;
 
 public class AddProjectActivity extends AppCompatActivity {

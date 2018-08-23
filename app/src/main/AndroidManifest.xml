@@ -8,18 +8,19 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name="ro.alexsicoe.clepsydra.activity.MainActivity">
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor">
+        <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="ro.alexsicoe.clepsydra.activity.ProjectListActivity" />
-        <activity android:name="ro.alexsicoe.clepsydra.activity.SettingsActivity" />
-        <activity android:name="ro.alexsicoe.clepsydra.activity.AboutActivity" />
-        <activity android:name="ro.alexsicoe.clepsydra.activity.AddProjectActivity"></activity>
+        <activity android:name=".activity.ProjectListActivity" />
+        <activity android:name=".activity.SettingsActivity" />
+        <activity android:name=".activity.AboutActivity" />
+        <activity android:name=".activity.AddProjectActivity" />
+        <activity android:name=".activity.MainActivity" />
     </application>
 
 </manifest>

@@ -13,11 +13,16 @@ public class ProjectListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(ro.alexsicoe.clepsydra.R.layout.activity_project_list);
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.root_layout, ProjectListFragment.newInstance(1), "projectListFragment")
                     .commit();
         }
+
+
     }
+
+
+
 }

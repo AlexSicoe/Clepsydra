@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.utils;
+package ro.alexsicoe.clepsydra.util;
 
 
 import android.content.Context;
