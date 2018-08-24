@@ -24,6 +24,7 @@ import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.util.DateTimeUtil;
 import ro.alexsicoe.clepsydra.model.Project;
 
+@Deprecated
 public class AddProjectActivity extends AppCompatActivity {
 
     private static final String TAG = AddProjectActivity.class.getSimpleName();
@@ -59,8 +60,8 @@ public class AddProjectActivity extends AppCompatActivity {
 
         assert startDate != null;
         //TODO change johnDoe to logged user id
-        Project project = new Project(name, "JohnDoe", startDate);
-        addToDB(project);
+//        Project project = new Project(name, "JohnDoe", startDate);
+//        addToDB(project);
         finish();
     }
 
@@ -70,7 +71,7 @@ public class AddProjectActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                        Toast.makeText(AddProjectActivity.this, R.string.projectAddSuccess, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddProjectActivity.this, R.string.project_successfully_created, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

@@ -1,16 +1,14 @@
 package ro.alexsicoe.clepsydra.model;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-
-import com.google.firebase.firestore.ServerTimestamp;
 
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class Project implements Serializable, Cloneable {
 
+    @NonNull
+    private String id;
     @NonNull
     private String name;
     @NonNull
@@ -23,16 +21,18 @@ public class Project implements Serializable, Cloneable {
     public Project() {
     }
 
-    public Project(@NonNull String name, @NonNull String createdBy) {
-        this.name = name;
-        this.createdBy = createdBy;
-        this.start = new Date();
-    }
-
-    public Project(@NonNull String name, @NonNull String createdBy, @NonNull Date start) {
+    public Project(@NonNull String id, @NonNull String name, @NonNull String createdBy, @NonNull Date start) {
+        this.id = id;
         this.name = name;
         this.createdBy = createdBy;
         this.start = start;
+    }
+
+    public Project(@NonNull String id, @NonNull String name, @NonNull String createdBy) {
+        this.id = id;
+        this.name = name;
+        this.createdBy = createdBy;
+        this.start = new Date();
     }
 
     @NonNull
@@ -60,5 +60,15 @@ public class Project implements Serializable, Cloneable {
 
     public void setStart(@NonNull Date start) {
         this.start = start;
+    }
+
+    @NonNull
+    public String getId() {
+        return id;
+    }
+
+    public Project setId(@NonNull String id) {
+        this.id = id;
+        return this;
     }
 }

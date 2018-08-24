@@ -2,7 +2,9 @@ package ro.alexsicoe.clepsydra.fragment;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,28 +14,32 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.activity.AddProjectActivity;
 import ro.alexsicoe.clepsydra.model.Project;
 import ro.alexsicoe.clepsydra.model.RequestType;
 
@@ -44,10 +50,12 @@ public class ProjectListFragment extends Fragment {
     private static final String TAG = ProjectListFragment.class.getSimpleName();
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    private String userEmail;
     private int columnCount = 1;
     private List<Project> projects;
     private Unbinder unbinder;
-    private FirebaseFirestore db;
+    private FirebaseFirestore rootRef;
+    private CollectionReference userProjectRef;
 
 
     public static ProjectListFragment newInstance(int columnCount) {
@@ -76,20 +84,31 @@ public class ProjectListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         initLayoutManager(context);
 
-        db = FirebaseFirestore.getInstance();
+        getAccountDetails(context);
 
-        queryAllProjects();
+
+        rootRef = FirebaseFirestore.getInstance();
+        userProjectRef = rootRef.collection("projects").document(userEmail).collection("userProjects");
+
+        readProjects();
 
 
         initItemTouchHelper();
         return view;
     }
 
-    private void queryAllProjects() {
+    private void getAccountDetails(Context context) {
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
+        if (googleSignInAccount != null) {
+            userEmail = googleSignInAccount.getEmail();
+        }
+    }
+
+    private void readProjects() {
         //TODO user is part of project
 
         projects = new ArrayList<>();
-        db.collection("projects")
+        rootRef.collection("projects")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -129,8 +148,45 @@ public class ProjectListFragment extends Fragment {
 
     @OnClick(R.id.fab)
     public void onClickFab() {
-        Intent intent = new Intent(getContext(), AddProjectActivity.class);
-        startActivityForResult(intent, RequestType.ADD.getCode());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.create_project);
+
+        final EditText etProjectName = new EditText(getContext());
+        etProjectName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        etProjectName.setHint(R.string.project_name);
+        //etProjectName.setHintTextColor(Color.GRAY);
+        builder.setView(etProjectName);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String projectName = etProjectName.getText().toString().trim();
+
+                createProject(projectName);
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void createProject(String projectName) {
+        String projectId = userProjectRef.document().getId();
+        Project project = new Project(projectId, projectName, userEmail);
+        userProjectRef.document(projectId).set(project).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Project successfully created!");
+                Toast.makeText(getContext(), R.string.project_successfully_created, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initLayoutManager(Context context) {
@@ -182,7 +238,7 @@ public class ProjectListFragment extends Fragment {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 Project project = projects.remove(position);
-                //TODO delete from db
+                //TODO delete from rootRef
                 recyclerView.getAdapter().notifyItemRemoved(position);
             }
         };

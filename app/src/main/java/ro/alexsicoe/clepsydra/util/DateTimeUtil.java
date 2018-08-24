@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+@Deprecated
 public final class DateTimeUtil {
     private static final String template = "MM/dd/yyyy HH:mm";
     private static DateFormat format;

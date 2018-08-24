@@ -6,10 +6,11 @@
     <string name="startDate">Start date</string>
     <string name="dateTimeFormat">MM/dd/yyyy HH:mm</string>
     <string name="project_name">Project name</string>
-    <string name="projectAddSuccess">Project added succesfully!</string>
+    <string name="project_successfully_created">Project successfully created!</string>
     <string name="error">Some error</string>
     <string name="textview">TextView</string>
     <string name="listitem">listItem</string>
     <string name="successful_sign_up">Successful sign up!</string>
     <string name="sign_out">Sign Out</string>
+    <string name="create_project">Create Project</string>
 </resources>

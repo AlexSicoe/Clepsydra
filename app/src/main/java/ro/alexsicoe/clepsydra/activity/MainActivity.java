@@ -39,14 +39,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        //TODO replace with shared preferences, settings
         DateTimeUtil.setFormat(this);
 
-        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (googleSignInAccount != null) {
-            userEmail = googleSignInAccount.getEmail();
-            userName = googleSignInAccount.getDisplayName();
-            Toast.makeText(this, "Welcome " + userName, Toast.LENGTH_LONG).show();
-        }
+        getAccountDetails();
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
@@ -65,6 +62,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private void getAccountDetails() {
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
+        if (googleSignInAccount != null) {
+            userEmail = googleSignInAccount.getEmail();
+            userName = googleSignInAccount.getDisplayName();
+            Toast.makeText(this, "Welcome " + userName, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

@@ -12,7 +12,6 @@ public class User {
     private String position;
     @NonNull
     private String tokenId;
-    //TODO Bitmap profilePicture;
     //private List<Task> tasks;
 
 
