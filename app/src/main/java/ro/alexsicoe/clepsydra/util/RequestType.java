@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.model;
+package ro.alexsicoe.clepsydra.util;
 
 public enum RequestType {
     ADD(1),

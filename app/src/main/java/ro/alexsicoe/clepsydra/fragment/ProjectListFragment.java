@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -41,7 +42,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Project;
-import ro.alexsicoe.clepsydra.model.RequestType;
+import ro.alexsicoe.clepsydra.util.RequestType;
 
 public class ProjectListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -50,6 +51,8 @@ public class ProjectListFragment extends Fragment {
     private static final String TAG = ProjectListFragment.class.getSimpleName();
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
     private String userEmail;
     private int columnCount = 1;
     private List<Project> projects;
@@ -106,9 +109,8 @@ public class ProjectListFragment extends Fragment {
 
     private void readProjects() {
         //TODO user is part of project
-
         projects = new ArrayList<>();
-        rootRef.collection("projects")
+        userProjectRef
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -178,6 +180,7 @@ public class ProjectListFragment extends Fragment {
     }
 
     private void createProject(String projectName) {
+        //Daca nu precizez un id pt document, este generat unul
         String projectId = userProjectRef.document().getId();
         Project project = new Project(projectId, projectName, userEmail);
         userProjectRef.document(projectId).set(project).addOnSuccessListener(new OnSuccessListener<Void>() {
