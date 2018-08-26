@@ -7,13 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Project;
+import ro.alexsicoe.clepsydra.util.DateUtil;
 
+@Deprecated
 class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecyclerViewAdapter.ViewHolder> {
     private final List<Project> items;
     private final ProjectListFragment.OnItemClickListener listener;
@@ -39,7 +43,11 @@ class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecyclerVie
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.item = items.get(position);
-        holder.tvProjectName.setText(items.get(position).getName());
+        holder.tvProjectName.setText(holder.item.getName());
+        holder.tvCreatedBy.setText(holder.item.getCreatedBy());
+        DateFormat df =  new DateUtil(holder.view.getContext()).getDateFormat(DateFormat.MEDIUM);
+        holder.tvStartDate.setText(df.format(holder.item.getStart()));
+
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,10 +58,14 @@ class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecyclerVie
         });
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         private final View view;
         @BindView(R.id.tvProjectName)
         TextView tvProjectName;
+        @BindView(R.id.tvCreatedBy)
+        TextView tvCreatedBy;
+        @BindView(R.id.tvStartDate)
+        TextView tvStartDate;
         private Project item;
 
         private ViewHolder(View view) {
@@ -61,11 +73,5 @@ class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecyclerVie
             this.view = view;
             ButterKnife.bind(this, view);
         }
-
-        public String toString() {
-            return super.toString() + " '" + tvProjectName.getText() + "'";
-        }
-
-
     }
 }

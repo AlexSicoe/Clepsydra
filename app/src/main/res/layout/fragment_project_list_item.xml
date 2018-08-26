@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -8,7 +9,39 @@
         android:id="@+id/tvProjectName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/listitem"
-        android:textColor="@android:color/black" />
-</LinearLayout>
+        android:layout_marginEnd="8sp"
+        android:layout_marginStart="8sp"
+        android:layout_marginTop="8sp"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        tools:text="Project 1" />
+
+    <TextView
+        android:id="@+id/tvCreatedBy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvProjectName"
+        android:layout_marginStart="8sp"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        tools:text="Created by: John Doe" />
+
+    <TextView
+        android:id="@+id/tvStartDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/tvProjectName"
+        android:layout_marginEnd="8sp"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        tools:text="Aug 24, 2018" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvCreatedBy"
+        android:layout_margin="8sp"
+        android:background="@android:color/darker_gray" />
+
+</RelativeLayout>

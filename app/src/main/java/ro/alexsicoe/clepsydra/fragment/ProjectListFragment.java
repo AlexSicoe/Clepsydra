@@ -21,8 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +33,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -53,12 +57,15 @@ public class ProjectListFragment extends Fragment {
     RecyclerView recyclerView;
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
+    @BindView(R.id.tvEmpty)
+    TextView tvEmpty;
     private String userEmail;
     private int columnCount = 1;
     private List<Project> projects;
     private Unbinder unbinder;
     private FirebaseFirestore rootRef;
     private CollectionReference userProjectRef;
+    private FirestoreRecyclerAdapter<Project, ProjectViewHolder> firestoreAdapter;
 
 
     public static ProjectListFragment newInstance(int columnCount) {
@@ -75,7 +82,6 @@ public class ProjectListFragment extends Fragment {
 
         if (getArguments() != null) {
             columnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-
         }
     }
 
@@ -86,18 +92,69 @@ public class ProjectListFragment extends Fragment {
         final Context context = view.getContext();
         unbinder = ButterKnife.bind(this, view);
         initLayoutManager(context);
-
         getAccountDetails(context);
-
-
         rootRef = FirebaseFirestore.getInstance();
         userProjectRef = rootRef.collection("projects").document(userEmail).collection("userProjects");
 
-        readProjects();
+        Query query = userProjectRef.orderBy("name", Query.Direction.ASCENDING);
+        FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()
+                .setQuery(query, Project.class)
+                .build();
+
+        firestoreAdapter = new FirestoreRecyclerAdapter<Project, ProjectViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull ProjectViewHolder holder, int position, @NonNull Project model) {
+                holder.setModel(context, userEmail, model);
+            }
+
+            @NonNull
+            @Override
+            public ProjectViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.fragment_project_list_item, parent, false);
+                return new ProjectViewHolder(view);
+            }
+
+            @Override
+            public void onDataChanged() {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
+
+                if (getItemCount() == 0) {
+                    recyclerView.setVisibility(View.GONE);
+                    tvEmpty.setVisibility(View.VISIBLE);
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    tvEmpty.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public int getItemCount() {
+                return super.getItemCount();
+            }
+        };
+        recyclerView.setAdapter(firestoreAdapter);
 
 
+//        readProjects();
         initItemTouchHelper();
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        firestoreAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (firestoreAdapter != null) {
+            firestoreAdapter.stopListening();
+        }
     }
 
     private void getAccountDetails(Context context) {
@@ -107,6 +164,7 @@ public class ProjectListFragment extends Fragment {
         }
     }
 
+    @Deprecated
     private void readProjects() {
         //TODO user is part of project
         projects = new ArrayList<>();
@@ -131,6 +189,7 @@ public class ProjectListFragment extends Fragment {
                 });
     }
 
+    @Deprecated
     private void setProjectRecyclerViewAdapter() {
         recyclerView.setAdapter(new ProjectRecyclerViewAdapter(projects, new OnItemClickListener() {
                     @Override

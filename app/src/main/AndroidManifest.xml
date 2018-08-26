@@ -19,7 +19,6 @@
         <activity android:name=".activity.ProjectListActivity" />
         <activity android:name=".activity.SettingsActivity" />
         <activity android:name=".activity.AboutActivity" />
-        <activity android:name=".activity.AddProjectActivity" />
         <activity android:name=".activity.MainActivity" />
     </application>
 

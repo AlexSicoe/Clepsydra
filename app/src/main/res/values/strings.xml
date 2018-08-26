@@ -13,4 +13,6 @@
     <string name="successful_sign_up">Successful sign up!</string>
     <string name="sign_out">Sign Out</string>
     <string name="create_project">Create Project</string>
+    <string name="there_are_no_projects_yet">There are no Projects yet!</string>
+    <string name="created_by">Created by:</string>
 </resources>

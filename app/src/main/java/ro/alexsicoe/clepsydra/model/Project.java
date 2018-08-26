@@ -2,10 +2,9 @@ package ro.alexsicoe.clepsydra.model;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class Project implements Serializable, Cloneable {
+public class Project {
 
     @NonNull
     private String id;

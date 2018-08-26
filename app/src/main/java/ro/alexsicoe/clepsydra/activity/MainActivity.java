@@ -25,7 +25,6 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.util.DateTimeUtil;
 
 public class MainActivity extends AppCompatActivity {
     private String userEmail, userName;
@@ -39,9 +38,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        //TODO replace with shared preferences, settings
-        DateTimeUtil.setFormat(this);
 
         getAccountDetails();
 
