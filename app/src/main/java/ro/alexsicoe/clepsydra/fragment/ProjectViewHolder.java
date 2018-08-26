@@ -1,6 +1,7 @@
 package ro.alexsicoe.clepsydra.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
+import ro.alexsicoe.clepsydra.activity.ProjectActivity;
 import ro.alexsicoe.clepsydra.model.Project;
 import ro.alexsicoe.clepsydra.util.DateUtil;
 
@@ -42,8 +44,9 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO open ProjectActivity
-                Toast.makeText(context, model.getName(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(context, ProjectActivity.class);
+                intent.putExtra("Project", model);
+                v.getContext().startActivity(intent);
             }
         });
 
@@ -55,6 +58,8 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
                 return true;
             }
         });
+
+        //TODO swipe delete
     }
 
 

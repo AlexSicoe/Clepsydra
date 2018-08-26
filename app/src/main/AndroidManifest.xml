@@ -13,6 +13,7 @@
         <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -20,6 +21,10 @@
         <activity android:name=".activity.SettingsActivity" />
         <activity android:name=".activity.AboutActivity" />
         <activity android:name=".activity.MainActivity" />
+        <activity
+            android:name=".activity.ProjectActivity"
+            android:label="@string/title_activity_project"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
