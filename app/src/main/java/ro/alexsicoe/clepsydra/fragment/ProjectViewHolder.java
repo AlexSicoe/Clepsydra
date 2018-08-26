@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -28,7 +29,7 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public void setModel(Context context, String userEmail, Project model) {
+    public void setModel(final Context context, String userEmail, final Project model) {
         String id = model.getId();
         String name = model.getName();
         tvProjectName.setText(name);
@@ -37,6 +38,23 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
         Date startDate = model.getStart();
         DateFormat df = new DateUtil(context).getDateFormat(DateFormat.MEDIUM);
         tvStartDate.setText(df.format(startDate));
+
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO open ProjectActivity
+                Toast.makeText(context, model.getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //TODO edit project
+                Toast.makeText(context, model.getId(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
 

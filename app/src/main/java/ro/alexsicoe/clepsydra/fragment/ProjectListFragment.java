@@ -1,11 +1,9 @@
 package ro.alexsicoe.clepsydra.fragment;
 
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,17 +26,10 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,12 +37,9 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Project;
-import ro.alexsicoe.clepsydra.util.RequestType;
 
 public class ProjectListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String STR_PROJECT = "project";
-    private static final String STR_INDEX = "index";
     private static final String TAG = ProjectListFragment.class.getSimpleName();
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -59,9 +47,8 @@ public class ProjectListFragment extends Fragment {
     ProgressBar progressBar;
     @BindView(R.id.tvEmpty)
     TextView tvEmpty;
-    private String userEmail;
     private int columnCount = 1;
-    private List<Project> projects;
+    private String userEmail;
     private Unbinder unbinder;
     private FirebaseFirestore rootRef;
     private CollectionReference userProjectRef;
@@ -137,8 +124,6 @@ public class ProjectListFragment extends Fragment {
         };
         recyclerView.setAdapter(firestoreAdapter);
 
-
-//        readProjects();
         initItemTouchHelper();
         return view;
     }
@@ -164,42 +149,6 @@ public class ProjectListFragment extends Fragment {
         }
     }
 
-    @Deprecated
-    private void readProjects() {
-        //TODO user is part of project
-        projects = new ArrayList<>();
-        userProjectRef
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                                Project project = document.toObject(Project.class);
-                                projects.add(project);
-                                setProjectRecyclerViewAdapter();
-                            }
-                            //
-                        } else {
-                            Log.d(TAG, "Error getting document: ", task.getException());
-                            Toast.makeText(getContext(), R.string.error, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    @Deprecated
-    private void setProjectRecyclerViewAdapter() {
-        recyclerView.setAdapter(new ProjectRecyclerViewAdapter(projects, new OnItemClickListener() {
-                    @Override
-                    public void onClickItem(Project project, int index) {
-                        //TODO start ProjectActivity
-                        Toast.makeText(getContext(), project.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                })
-        );
-    }
 
     @Override
     public void onDestroyView() {
@@ -259,35 +208,6 @@ public class ProjectListFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == RequestType.ADD.getCode()) {
-                Project project = (Project) data.getSerializableExtra(STR_PROJECT);
-
-                projects.add(project);
-                //TODO insert into DB
-                recyclerView.getAdapter().notifyItemInserted(projects.size() - 1);
-                Toast.makeText(getContext(), "Project added successfully!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (requestCode == RequestType.EDIT.getCode()) {
-                Project project = (Project) data.getSerializableExtra(STR_PROJECT);
-                int index = data.getIntExtra(STR_INDEX, projects.size() - 1);
-                projects.set(index, project);
-                //TODO update DB
-                recyclerView.getAdapter().notifyItemChanged(index);
-                Toast.makeText(getContext(), "Project modified!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            try {
-                throw new Exception("Request code " + requestCode + " not implemented!");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     private void initItemTouchHelper() {
         ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -299,7 +219,6 @@ public class ProjectListFragment extends Fragment {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                Project project = projects.remove(position);
                 //TODO delete from rootRef
                 recyclerView.getAdapter().notifyItemRemoved(position);
             }
@@ -307,9 +226,5 @@ public class ProjectListFragment extends Fragment {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-    }
-
-    public interface OnItemClickListener {
-        void onClickItem(Project project, int index);
     }
 }
