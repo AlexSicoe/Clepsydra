@@ -53,7 +53,7 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //TODO edit project
+                //TODO edit menu_project
                 Toast.makeText(context, model.getId(), Toast.LENGTH_SHORT).show();
                 return true;
             }
