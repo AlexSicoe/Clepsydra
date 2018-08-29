@@ -10,7 +10,7 @@
 
     android:layout_height="match_parent"
 
-    tools:context=".activity.AddProjectActivity">
+    tools:context=".controller.activity.AddProjectActivity">
 
 
     <LinearLayout

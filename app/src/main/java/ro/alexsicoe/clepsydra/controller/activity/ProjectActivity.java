@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.activity;
+package ro.alexsicoe.clepsydra.controller.activity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,11 +12,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ro.alexsicoe.clepsydra.R;
+import ro.alexsicoe.clepsydra.controller.fragment.UserTaskListFragment;
 
 public class ProjectActivity extends AppCompatActivity {
     @BindView(R.id.drawer_layout)
@@ -33,12 +35,16 @@ public class ProjectActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         setNav();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.root_layout, UserTaskListFragment.newInstance(), "userTaskListFragment")
+                .commit();
 
     }
 
@@ -46,17 +52,18 @@ public class ProjectActivity extends AppCompatActivity {
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                // Handle navigation view item clicks here.
                 int id = item.getItemId();
 
+
+
                 if (id == R.id.nav_resources) {
-                    // Handle the camera action
+                    //TODO
                 } else if (id == R.id.nav_checklist) {
 
                 } else if (id == R.id.nav_track_progress) {
 
                 } else if (id == R.id.nav_manage) {
-
+                    Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_share) {
 
                 } else if (id == R.id.nav_add) {

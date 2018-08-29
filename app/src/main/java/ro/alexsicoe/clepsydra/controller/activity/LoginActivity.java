@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.activity;
+package ro.alexsicoe.clepsydra.controller.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
                     String userName = googleSignInAccount.getDisplayName();
                     String tokenID = FirebaseInstanceId.getInstance().getToken();
 
-                    User user = new User(userName, userEmail, null, tokenID);
+                    User user = new User(userName, userEmail, null, tokenID, null);
                     rootRef.collection("users").document(userEmail).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {

@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.fragment;
+package ro.alexsicoe.clepsydra.view.recyclerView.viewHolder;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.activity.ProjectActivity;
+import ro.alexsicoe.clepsydra.controller.activity.ProjectActivity;
 import ro.alexsicoe.clepsydra.model.Project;
 import ro.alexsicoe.clepsydra.util.DateUtil;
 
@@ -25,7 +25,7 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.tvStartDate)
     TextView tvStartDate;
 
-    ProjectViewHolder(View view) {
+    public ProjectViewHolder(View view) {
         super(view);
         ButterKnife.bind(this, view);
     }

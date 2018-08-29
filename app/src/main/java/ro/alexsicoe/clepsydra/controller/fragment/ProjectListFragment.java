@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.fragment;
+package ro.alexsicoe.clepsydra.controller.fragment;
 
 
 import android.app.AlertDialog;
@@ -37,6 +37,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Project;
+import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.ProjectViewHolder;
 
 public class ProjectListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -98,7 +99,7 @@ public class ProjectListFragment extends Fragment {
             @Override
             public ProjectViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.fragment_project_list_item, parent, false);
+                        .inflate(R.layout.list_item_project, parent, false);
                 return new ProjectViewHolder(view);
             }
 

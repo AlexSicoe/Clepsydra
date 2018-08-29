@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.activity;
+package ro.alexsicoe.clepsydra.controller.activity;
 
 
 import android.content.Intent;
