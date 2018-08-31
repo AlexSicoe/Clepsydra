@@ -2,6 +2,7 @@ package ro.alexsicoe.clepsydra.controller.fragment;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -16,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TimePicker;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -35,6 +39,7 @@ import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.model.User;
+import ro.alexsicoe.clepsydra.util.DateTimeObserver;
 import ro.alexsicoe.clepsydra.util.DateUtil;
 import ro.alexsicoe.clepsydra.view.recyclerView.adapter.UserAdapter;
 
@@ -128,34 +133,33 @@ public class UserTaskListFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.create_task);
 
+        String taskName;
+        Date startDate;
+        Date finishDate;
+
+        LinearLayout layout = new LinearLayout(getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+
         EditText etTaskName = new EditText(getContext());
         etTaskName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         etTaskName.setHint(R.string.task_name);
+
         final EditText etStartDate = new EditText(getContext());
-        EditText etFinishDate = new EditText(getContext());
+        final EditText etFinishDate = new EditText(getContext());
+        etStartDate.setFocusable(false);
+        etFinishDate.setFocusable(false);
+        etStartDate.setHint(R.string.start_date);
+        etFinishDate.setHint(R.string.finish_date);
 
-        final Calendar calendar = Calendar.getInstance();
-        final int cYear = calendar.get(Calendar.YEAR);
-        final int cMonth = calendar.get(Calendar.MONTH);
-        final int cDay = calendar.get(Calendar.DAY_OF_MONTH);
+        DateTimeObserver dateTimeObserver = new DateTimeObserver(getContext());
+        etStartDate.setOnClickListener(dateTimeObserver);
+        etFinishDate.setOnClickListener(dateTimeObserver);
 
-        etStartDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(v.getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        DateFormat df = new DateUtil(getContext()).getDateTimeFormat();
-                        calendar.set(year, month, dayOfMonth);
-                        etStartDate.setText(calendar.toString());
-//                        calendar.getTime();
-                    }
-                }, cYear, cMonth, cDay).show();
-            }
-        });
 
-        builder.setView(etStartDate);
-        builder.setView(etFinishDate);
+        layout.addView(etTaskName);
+        layout.addView(etStartDate);
+        layout.addView(etFinishDate);
+        builder.setView(layout);
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
