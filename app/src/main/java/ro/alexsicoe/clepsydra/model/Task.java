@@ -110,7 +110,7 @@ public class Task implements Parcelable {
         }
     }
 
-    public class Interval {
+    public static class Interval {
         private Date start;
         private Date finish;
 

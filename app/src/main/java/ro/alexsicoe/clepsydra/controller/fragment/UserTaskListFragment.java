@@ -1,8 +1,6 @@
 package ro.alexsicoe.clepsydra.controller.fragment;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -15,11 +13,9 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TimePicker;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -27,8 +23,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -133,14 +129,10 @@ public class UserTaskListFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(R.string.create_task);
 
-        String taskName;
-        Date startDate;
-        Date finishDate;
-
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
 
-        EditText etTaskName = new EditText(getContext());
+        final EditText etTaskName = new EditText(getContext());
         etTaskName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         etTaskName.setHint(R.string.task_name);
 
@@ -155,7 +147,6 @@ public class UserTaskListFragment extends Fragment {
         etStartDate.setOnClickListener(dateTimeObserver);
         etFinishDate.setOnClickListener(dateTimeObserver);
 
-
         layout.addView(etTaskName);
         layout.addView(etStartDate);
         layout.addView(etFinishDate);
@@ -164,12 +155,22 @@ public class UserTaskListFragment extends Fragment {
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //        Task.Interval interval = new Task.Interval()
-                //        Task task;
-            }
-        });
+                String taskName = etTaskName.toString();
+                Date startDate = null;
+                Date finishDate = null;
 
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                DateFormat df = new DateUtil(getContext()).getDateTimeFormat();
+                try {
+                    startDate = df.parse(etStartDate.toString());
+                    finishDate = df.parse(etFinishDate.toString());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Task.Interval interval = new Task.Interval(startDate, finishDate);
+                Task task = new Task.Builder(taskName, interval).build();
+                //TODO
+            }
+        }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
