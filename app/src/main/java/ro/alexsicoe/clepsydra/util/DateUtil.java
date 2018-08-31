@@ -15,7 +15,7 @@ public final class DateUtil {
         locale = context.getResources().getConfiguration().locale;
     }
 
-    public DateFormat getDateFormat() {
+    public DateFormat getDateTimeFormat() {
         return new SimpleDateFormat(template, locale);
     }
 

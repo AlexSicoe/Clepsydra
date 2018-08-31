@@ -1,15 +1,21 @@
 package ro.alexsicoe.clepsydra.controller.fragment;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -17,7 +23,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -27,6 +35,7 @@ import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.model.User;
+import ro.alexsicoe.clepsydra.util.DateUtil;
 import ro.alexsicoe.clepsydra.view.recyclerView.adapter.UserAdapter;
 
 public class UserTaskListFragment extends Fragment {
@@ -73,7 +82,7 @@ public class UserTaskListFragment extends Fragment {
         for (int k = 0; k < 5; k++) {
             List<Task> tasks = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
-                tasks.add(new Task("Task" + k, false, null, null));
+                tasks.add(new Task.Builder("Task" + k, null).isComplete().setSubTasks(null).build());
             }
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",
@@ -115,8 +124,56 @@ public class UserTaskListFragment extends Fragment {
     }
 
     @OnClick(R.id.fab)
-    public void onClickFab() {
-        //TODO
+    public void onClickFab(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(R.string.create_task);
+
+        EditText etTaskName = new EditText(getContext());
+        etTaskName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        etTaskName.setHint(R.string.task_name);
+        final EditText etStartDate = new EditText(getContext());
+        EditText etFinishDate = new EditText(getContext());
+
+        final Calendar calendar = Calendar.getInstance();
+        final int cYear = calendar.get(Calendar.YEAR);
+        final int cMonth = calendar.get(Calendar.MONTH);
+        final int cDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+        etStartDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(v.getContext(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        DateFormat df = new DateUtil(getContext()).getDateTimeFormat();
+                        calendar.set(year, month, dayOfMonth);
+                        etStartDate.setText(calendar.toString());
+//                        calendar.getTime();
+                    }
+                }, cYear, cMonth, cDay).show();
+            }
+        });
+
+        builder.setView(etStartDate);
+        builder.setView(etFinishDate);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //        Task.Interval interval = new Task.Interval()
+                //        Task task;
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void getAccountDetails(Context context) {

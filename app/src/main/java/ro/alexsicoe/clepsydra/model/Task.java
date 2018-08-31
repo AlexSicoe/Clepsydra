@@ -9,6 +9,24 @@ import java.util.Date;
 import java.util.List;
 
 public class Task implements Parcelable {
+
+    @NonNull
+    private String name;
+    private boolean complete;
+    @NonNull
+    private Interval interval;
+    @Nullable
+    private List<Task> subTasks;
+
+    public Task() {
+    }
+
+    private Task(Parcel in) {
+        name = in.readString();
+        complete = in.readByte() != 0;
+        subTasks = in.createTypedArrayList(Task.CREATOR);
+    }
+
     public static final Creator<Task> CREATOR = new Creator<Task>() {
         @Override
         public Task createFromParcel(Parcel in) {
@@ -21,31 +39,6 @@ public class Task implements Parcelable {
         }
     };
 
-    @NonNull
-    private String name;
-    private boolean isComplete;
-    @NonNull
-    private Interval interval;
-    @Nullable
-    private List<Task> subTasks;
-
-    public Task() {
-
-    }
-
-    public Task(@NonNull String name, boolean isComplete, @NonNull Interval interval, List<Task> subTasks) {
-        this.name = name;
-        this.isComplete = isComplete;
-        this.interval = interval;
-        this.subTasks = subTasks;
-    }
-
-    private Task(Parcel in) {
-        name = in.readString();
-        isComplete = in.readByte() != 0;
-        subTasks = in.createTypedArrayList(Task.CREATOR);
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -54,7 +47,7 @@ public class Task implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        dest.writeByte((byte) (isComplete ? 1 : 0));
+        dest.writeByte((byte) (complete ? 1 : 0));
         dest.writeTypedList(subTasks);
     }
 
@@ -68,11 +61,11 @@ public class Task implements Parcelable {
     }
 
     public boolean isComplete() {
-        return isComplete;
+        return complete;
     }
 
     public void setComplete(boolean complete) {
-        isComplete = complete;
+        this.complete = complete;
     }
 
     @NonNull
@@ -91,6 +84,30 @@ public class Task implements Parcelable {
 
     public void setSubTasks(@Nullable List<Task> subTasks) {
         this.subTasks = subTasks;
+    }
+
+    public static class Builder {
+        private Task task;
+
+        public Builder(@NonNull String name, @NonNull Interval interval) {
+            this.task = new Task();
+            this.task.name = name;
+            this.task.interval = interval;
+        }
+
+        public Builder isComplete() {
+            this.task.complete = true;
+            return this;
+        }
+
+        public Builder setSubTasks(List<Task> subTasks) {
+            this.task.subTasks = subTasks;
+            return this;
+        }
+
+        public Task build() {
+            return this.task;
+        }
     }
 
     public class Interval {

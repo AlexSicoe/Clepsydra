@@ -77,11 +77,7 @@ public class ProjectActivity extends AppCompatActivity {
         });
     }
 
-    @OnClick(R.id.fab)
-    public void onClickFab(View view) {
-        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-    }
+
 
     @Override
     public void onBackPressed() {
