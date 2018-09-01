@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -112,6 +113,7 @@ public class LoginActivity extends AppCompatActivity {
                     String userEmail = googleSignInAccount.getEmail();
                     String userName = googleSignInAccount.getDisplayName();
                     String tokenID = FirebaseInstanceId.getInstance().getToken();
+//                    Task<InstanceIdResult> tokenID = FirebaseInstanceId.getInstance().getInstanceId();
 
                     User user = new User(userName, userEmail, null, tokenID, null);
                     rootRef.collection("users").document(userEmail).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {

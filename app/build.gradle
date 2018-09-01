@@ -50,6 +50,9 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.thoughtbot:expandablerecyclerview:1.3'
     implementation 'com.thoughtbot:expandablecheckrecyclerview:1.4'
+
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
 
 apply plugin: 'com.google.gms.google-services'
