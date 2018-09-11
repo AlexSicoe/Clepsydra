@@ -26,4 +26,8 @@
     <string name="task_name">Task name</string>
     <string name="start_date">Start date</string>
     <string name="finish_date">Finish date</string>
+    <string name="friends_email_address">Friend\'s email address</string>
+    <string name="please_insert_friends_email">Please insert your friend\'s email</string>
+    <string name="share_project">Share Project</string>
+    <string name="add">Add</string>
 </resources>

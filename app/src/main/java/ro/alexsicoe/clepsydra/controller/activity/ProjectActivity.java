@@ -1,5 +1,7 @@
 package ro.alexsicoe.clepsydra.controller.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,22 +11,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.async.DownloadImageTask;
 import ro.alexsicoe.clepsydra.controller.fragment.UserTaskListFragment;
+import ro.alexsicoe.clepsydra.model.Project;
 
 public class ProjectActivity extends AppCompatActivity {
     @BindView(R.id.drawer_layout)
@@ -37,12 +42,18 @@ public class ProjectActivity extends AppCompatActivity {
     private String userName;
     private Uri profilePictureLink;
     private final int PROFILE_PIC_SIZE = 250;
+    private Project project;
+    private String projectId;
+    private FirebaseFirestore rootRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project);
         ButterKnife.bind(this);
         getAccountDetails();
+        rootRef = FirebaseFirestore.getInstance();
+
 
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -64,6 +75,11 @@ public class ProjectActivity extends AppCompatActivity {
         Picasso.get().load(profilePictureLink).resize(PROFILE_PIC_SIZE,PROFILE_PIC_SIZE).into(ivProfilePicture);
         tvUserName.setText(userName);
         tvEmail.setText(userEmail);
+
+        ////
+        project = (Project) getIntent().getSerializableExtra("Project");
+        setTitle(project.getName());
+        projectId = project.getId();
     }
 
     private void getAccountDetails() {
@@ -85,16 +101,17 @@ public class ProjectActivity extends AppCompatActivity {
 
                 if (id == R.id.nav_resources) {
                     //TODO
+                    Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_checklist) {
-
+                    Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_track_progress) {
-
+                    Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_manage) {
                     Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_share) {
-
+                    Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_add) {
-
+                    shareProject();
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -102,6 +119,40 @@ public class ProjectActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void shareProject() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.share_project);
+        builder.setMessage(R.string.please_insert_friends_email);
+        final EditText etProjectName = new EditText(this);
+
+        //TODO validate email & existing in db as registered user
+        etProjectName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        etProjectName.setHint(R.string.friends_email_address);
+        //etProjectName.setHintTextColor(Color.GRAY);
+        builder.setView(etProjectName);
+
+        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //duplicating project to friend
+                String friendEmail = etProjectName.getText().toString().trim();
+                rootRef.collection("projects").document(friendEmail)
+                        .collection("userProjects").document(projectId)
+                        .set(project);
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
 
