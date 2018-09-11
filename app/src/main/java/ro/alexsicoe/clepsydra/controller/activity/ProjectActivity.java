@@ -125,19 +125,18 @@ public class ProjectActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.share_project);
         builder.setMessage(R.string.please_insert_friends_email);
-        final EditText etProjectName = new EditText(this);
+        final EditText et = new EditText(this);
 
         //TODO validate email & existing in db as registered user
-        etProjectName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-        etProjectName.setHint(R.string.friends_email_address);
-        //etProjectName.setHintTextColor(Color.GRAY);
-        builder.setView(etProjectName);
+        et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        et.setHint(R.string.friends_email_address);
+        builder.setView(et);
 
         builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //duplicating project to friend
-                String friendEmail = etProjectName.getText().toString().trim();
+                String friendEmail = et.getText().toString().trim();
                 rootRef.collection("projects").document(friendEmail)
                         .collection("userProjects").document(projectId)
                         .set(project);

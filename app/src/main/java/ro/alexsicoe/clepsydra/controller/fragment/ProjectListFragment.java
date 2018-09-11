@@ -165,7 +165,6 @@ public class ProjectListFragment extends Fragment {
         final EditText etProjectName = new EditText(getContext());
         etProjectName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         etProjectName.setHint(R.string.project_name);
-        //etProjectName.setHintTextColor(Color.GRAY);
         builder.setView(etProjectName);
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
