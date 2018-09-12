@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -72,6 +73,11 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
                 builder.setView(et);
 
                 final FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
+                        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                                .setTimestampsInSnapshotsEnabled(true)
+                                .build();
+                        rootRef.setFirestoreSettings(settings);
+
                 final Map<String, Object> map = new HashMap<>();
 
                 builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {

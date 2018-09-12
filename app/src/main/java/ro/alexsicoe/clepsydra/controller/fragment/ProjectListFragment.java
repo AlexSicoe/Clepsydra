@@ -22,8 +22,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,9 +44,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.controller.activity.ProjectListActivity;
 import ro.alexsicoe.clepsydra.model.Project;
-import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.ProjectViewHolder;
+import ro.alexsicoe.clepsydra.view.recyclerView.adapter.ProjectRecyclerViewAdapter;
 
 public class ProjectListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -66,10 +63,8 @@ public class ProjectListFragment extends Fragment {
     private CollectionReference usersRef;
     private CollectionReference projectsRef;
     private CollectionReference userProjectsRef;
-    @NonNull
-    private Query query;
-
-    private FirestoreRecyclerAdapter<Project, ProjectViewHolder> firestoreAdapter;
+    private List<Project> projects;
+    private ProjectRecyclerViewAdapter adapter;
 
 
     public static ProjectListFragment newInstance(int columnCount) {
@@ -98,6 +93,7 @@ public class ProjectListFragment extends Fragment {
         initLayoutManager(context);
         getAccountDetails(context);
         rootRef = FirebaseFirestore.getInstance();
+
         usersRef = rootRef.collection("Users");
         projectsRef = rootRef.collection("Projects");
         userProjectsRef = rootRef.collection("UserProjects");
@@ -105,101 +101,63 @@ public class ProjectListFragment extends Fragment {
 
         //TODO debug
         readUserProjects();
-
+        adapter = new ProjectRecyclerViewAdapter(projects, getContext(), userEmail);
+        recyclerView.setAdapter(adapter);
 
         initItemTouchHelper();
         return view;
     }
 
     private void readUserProjects() {
-        userProjectsRef
-                .whereEqualTo("userEmail", userEmail)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "Listen failed.", e);
-                            return;
-                        }
-                        assert snapshots != null;
-                        for (QueryDocumentSnapshot doc : snapshots) {
-                            if (doc.get("projectId") != null) {
-                                String projectId = doc.getString("projectId");
-                                projectsRef
-                                        .whereEqualTo("id", projectId)
-                                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                                                if (e != null) {
-                                                    Log.w(TAG, "Listen failed.", e);
-                                                    return;
-                                                }
-                                                for (QueryDocumentSnapshot doc : snapshots) {
-                                                    Log.d(TAG, doc.getData().toString());
-                                                }
-                                            }
-                                        });
+        projects = new ArrayList<>();
+        final Query queryProjectIds = userProjectsRef
+                .whereEqualTo("userEmail", userEmail);
+        queryProjectIds.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+                assert snapshots != null;
+                for (QueryDocumentSnapshot doc : snapshots) {
+                    if (doc.get("projectId") != null) {
+                        String projectId = doc.getString("projectId");
+                        Query queryProjects = projectsRef
+                                .orderBy("name", Query.Direction.ASCENDING)
+                                .whereEqualTo("id", projectId);
+                        queryProjects.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                                assert snapshots != null;
+                                if (e != null) {
+                                    Log.w(TAG, "Listen failed.", e);
+                                    return;
+                                }
+                                for (QueryDocumentSnapshot doc : snapshots) {
+                                    Project project = doc.toObject(Project.class);
+                                    projects.add(project);
+                                    //TODO notify adapter
+                                    recyclerView.getAdapter().notifyDataSetChanged();
+                                    Log.d(TAG, "project: " + project.toString());
+                                }
                             }
-//                            setFirestoreAdapter();
-                        }
+                        });
                     }
-                });
-    }
-
-    private void setFirestoreAdapter() {
-        FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()
-                .setQuery(query, Project.class)
-                .build();
-
-        firestoreAdapter = new FirestoreRecyclerAdapter<Project, ProjectViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull ProjectViewHolder holder, int position, @NonNull Project model) {
-                holder.setModel(getContext(), userEmail, model);
-            }
-
-            @NonNull
-            @Override
-            public ProjectViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.list_item_project, parent, false);
-                return new ProjectViewHolder(view);
-            }
-
-            @Override
-            public void onDataChanged() {
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
-                }
-
-                if (getItemCount() == 0) {
-                    recyclerView.setVisibility(View.GONE);
-                    tvEmpty.setVisibility(View.VISIBLE);
-                } else {
-                    recyclerView.setVisibility(View.VISIBLE);
-                    tvEmpty.setVisibility(View.GONE);
                 }
             }
-
-            @Override
-            public int getItemCount() {
-                return super.getItemCount();
-            }
-        };
-        recyclerView.setAdapter(firestoreAdapter);
+        });
     }
+
 
     @Override
     public void onStart() {
         super.onStart();
-//        firestoreAdapter.startListening();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (firestoreAdapter != null) {
-            firestoreAdapter.stopListening();
-        }
     }
 
     private void getAccountDetails(Context context) {

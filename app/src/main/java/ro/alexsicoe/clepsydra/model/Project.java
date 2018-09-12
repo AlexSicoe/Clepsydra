@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Project implements Serializable {
-
     @NonNull
     private String id;
     @NonNull
@@ -70,5 +69,15 @@ public class Project implements Serializable {
     public Project setId(@NonNull String id) {
         this.id = id;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", start=" + start +
+                '}';
     }
 }
