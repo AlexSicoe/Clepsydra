@@ -26,10 +26,18 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,7 +60,11 @@ public class ProjectListFragment extends Fragment {
     private String userEmail;
     private Unbinder unbinder;
     private FirebaseFirestore rootRef;
-    private CollectionReference userProjectRef;
+    private CollectionReference usersRef;
+    private CollectionReference projectsRef;
+    private CollectionReference userProjectsRef;
+    private         Query query;
+
     private FirestoreRecyclerAdapter<Project, ProjectViewHolder> firestoreAdapter;
 
 
@@ -82,9 +94,27 @@ public class ProjectListFragment extends Fragment {
         initLayoutManager(context);
         getAccountDetails(context);
         rootRef = FirebaseFirestore.getInstance();
-        userProjectRef = rootRef.collection("projects").document(userEmail).collection("userProjects");
+        usersRef = rootRef.collection("Users");
+        projectsRef = rootRef.collection("Projects");
+        userProjectsRef = rootRef.collection("UserProjects");
 
-        Query query = userProjectRef.orderBy("name", Query.Direction.ASCENDING);
+
+        userProjectsRef.whereEqualTo("userEmail", userEmail).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()) {
+                            for(QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                               query  = projectsRef.orderBy("name", Query.Direction.ASCENDING)
+                                       .whereEqualTo("id", document.get("projectId"));
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
         FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()
                 .setQuery(query, Project.class)
                 .build();
@@ -188,16 +218,28 @@ public class ProjectListFragment extends Fragment {
     }
 
     private void createProject(String projectName) {
-        //Daca nu precizez un id pt document, este generat unul
-        String projectId = userProjectRef.document().getId();
+        final String projectId = projectsRef.document().getId();
         Project project = new Project(projectId, projectName, userEmail);
-        userProjectRef.document(projectId).set(project).addOnSuccessListener(new OnSuccessListener<Void>() {
+        projectsRef.document(projectId).set(project).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Project successfully created!");
-                Toast.makeText(getContext(), R.string.project_successfully_created, Toast.LENGTH_SHORT).show();
+                createUserProject();
+            }
+
+            private void createUserProject() {
+                Map<String, Object> map = new HashMap<>();
+                map.put("userEmail", userEmail);
+                map.put("projectId", projectId);
+                userProjectsRef.add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "Project successfully created!");
+                        Toast.makeText(getContext(), R.string.project_successfully_created, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
+
     }
 
     private void initLayoutManager(Context context) {

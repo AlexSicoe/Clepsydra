@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private void signOut() {
         Map<String, Object> map = new HashMap<>();
         map.put("tokenId", FieldValue.delete());
-        rootRef.collection("users").document(userEmail).update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+        rootRef.collection("Users").document(userEmail).update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 firebaseAuth.signOut();

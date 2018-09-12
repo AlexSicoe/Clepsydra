@@ -48,7 +48,6 @@ public class UserTaskListFragment extends Fragment {
 
     private Unbinder unbinder;
     private FirebaseFirestore rootRef;
-    private CollectionReference userProjectRef;
     private String userEmail;
     private UserAdapter adapter;
 
@@ -69,7 +68,6 @@ public class UserTaskListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         getAccountDetails(context);
         rootRef = FirebaseFirestore.getInstance();
-        userProjectRef = rootRef.collection("projects").document(userEmail).collection("userProjects");
 
         List<User.Group> users = mockUsers();
         adapter = new UserAdapter(users, context);

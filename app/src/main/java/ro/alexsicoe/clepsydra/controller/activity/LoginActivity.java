@@ -116,7 +116,7 @@ public class LoginActivity extends AppCompatActivity {
 //                    Task<InstanceIdResult> tokenID = FirebaseInstanceId.getInstance().getInstanceId();
 
                     User user = new User(userName, userEmail, null, tokenID, null);
-                    rootRef.collection("users").document(userEmail).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    rootRef.collection("Users").document(userEmail).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "User successfully created!");
