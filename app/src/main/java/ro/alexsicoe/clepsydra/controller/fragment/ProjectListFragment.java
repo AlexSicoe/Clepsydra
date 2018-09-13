@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -102,13 +104,26 @@ public class ProjectListFragment extends Fragment {
 
 
         //TODO debug
-     projects = new ArrayList<>();
+        projects = new ArrayList<>();
         adapter = new ProjectRecyclerViewAdapter(projects, getContext(), userEmail);
         recyclerView.setAdapter(adapter);
         readUserProjects();
 
         initItemTouchHelper();
         return view;
+    }
+
+    public void readAllProjects() {
+        projectsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                for(QueryDocumentSnapshot doc : snapshots) {
+                    Project project = doc.toObject(Project.class);
+                    projects.add(project);
+                }
+                recyclerView.getAdapter().notifyDataSetChanged();
+            }
+        });
     }
 
     private void readUserProjects() {
@@ -135,11 +150,37 @@ public class ProjectListFragment extends Fragment {
                             }
                         }
 
+                        /*
+                        Task<List<Task<?>>> allTasks = Tasks.whenAllComplete(tasks);
+                        allTasks.addOnCompleteListener(new OnCompleteListener<List<Task<?>>>() {
+                            @Override
+                            public void onComplete(@NonNull Task<List<Task<?>>> task) {
+                                projects.clear();
+                                List<Task<?>> results = task.getResult();
+                                for (Task<?> querySnapshotTask : results) {
+                                    QuerySnapshot snapshots = (QuerySnapshot) querySnapshotTask.getResult();
+                                    for (QueryDocumentSnapshot doc : snapshots) {
+                                        Log.d(TAG, doc.getData().toString());
+                                        Project project = doc.toObject(Project.class);
+                                        projects.add(project);
+                                    }
+                                }
+                                recyclerView.getAdapter().notifyDataSetChanged();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(TAG, e.toString());
+                            }
+                        });
+                        */
+
+
                         Task<List<QuerySnapshot>> combinedTask = Tasks.whenAllSuccess(tasks);
                         combinedTask.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
                             @Override
                             public void onSuccess(List<QuerySnapshot> querySnapshots) {
-                                projects = new ArrayList<>();
+                                projects.clear();
                                 for (QuerySnapshot snapshots : querySnapshots) {
                                     Query query = snapshots.getQuery();
                                     for (QueryDocumentSnapshot doc : snapshots) {
@@ -148,16 +189,8 @@ public class ProjectListFragment extends Fragment {
                                     }
                                 }
                                 recyclerView.getAdapter().notifyDataSetChanged();
-                                for(Project p : projects) {
-                                    Log.d(TAG, p.toString());
-                                }
                             }
                         });
-
-
-//                        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllComplete(tasks);
-
-
 
                     }
                 });
