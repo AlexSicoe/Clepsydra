@@ -25,6 +25,8 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
@@ -100,53 +102,65 @@ public class ProjectListFragment extends Fragment {
 
 
         //TODO debug
-        readUserProjects();
+     projects = new ArrayList<>();
         adapter = new ProjectRecyclerViewAdapter(projects, getContext(), userEmail);
         recyclerView.setAdapter(adapter);
+        readUserProjects();
 
         initItemTouchHelper();
         return view;
     }
 
     private void readUserProjects() {
-        projects = new ArrayList<>();
-        final Query queryProjectIds = userProjectsRef
-                .whereEqualTo("userEmail", userEmail);
-        queryProjectIds.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
-                assert snapshots != null;
-                for (QueryDocumentSnapshot doc : snapshots) {
-                    if (doc.get("projectId") != null) {
-                        String projectId = doc.getString("projectId");
-                        Query queryProjects = projectsRef
-                                .orderBy("name", Query.Direction.ASCENDING)
-                                .whereEqualTo("id", projectId);
-                        queryProjects.addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+        userProjectsRef
+                .whereEqualTo("userEmail", userEmail)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+
+                        List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+                        assert snapshots != null;
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            if (doc.get("projectId") != null) {
+                                String projectId = doc.getString("projectId");
+                                Task<QuerySnapshot> task = projectsRef
+                                        .whereEqualTo("id", projectId).get();
+                                tasks.add(task);
+                            }
+                        }
+
+                        Task<List<QuerySnapshot>> combinedTask = Tasks.whenAllSuccess(tasks);
+                        combinedTask.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
                             @Override
-                            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                                assert snapshots != null;
-                                if (e != null) {
-                                    Log.w(TAG, "Listen failed.", e);
-                                    return;
+                            public void onSuccess(List<QuerySnapshot> querySnapshots) {
+                                projects = new ArrayList<>();
+                                for (QuerySnapshot snapshots : querySnapshots) {
+                                    Query query = snapshots.getQuery();
+                                    for (QueryDocumentSnapshot doc : snapshots) {
+                                        Project project = doc.toObject(Project.class);
+                                        projects.add(project);
+                                    }
                                 }
-                                for (QueryDocumentSnapshot doc : snapshots) {
-                                    Project project = doc.toObject(Project.class);
-                                    projects.add(project);
-                                    //TODO notify adapter
-                                    recyclerView.getAdapter().notifyDataSetChanged();
-                                    Log.d(TAG, "project: " + project.toString());
+                                recyclerView.getAdapter().notifyDataSetChanged();
+                                for(Project p : projects) {
+                                    Log.d(TAG, p.toString());
                                 }
                             }
                         });
+
+
+//                        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllComplete(tasks);
+
+
+
                     }
-                }
-            }
-        });
+                });
     }
 
 

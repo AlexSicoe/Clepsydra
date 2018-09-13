@@ -16,15 +16,15 @@ public class User {
     private String position;
     @NonNull
     private String tokenId;
-    private List<Task> tasks;
+    private List<Taskk> taskks;
 
 
-    public User(@Nullable String name, @NonNull String email, @Nullable String position, @NonNull String tokenId, List<Task> tasks) {
+    public User(@Nullable String name, @NonNull String email, @Nullable String position, @NonNull String tokenId, List<Taskk> taskks) {
         this.name = name;
         this.email = email;
         this.position = position;
         this.tokenId = tokenId;
-        this.tasks = tasks;
+        this.taskks = taskks;
     }
 
 
@@ -67,17 +67,17 @@ public class User {
         this.tokenId = tokenId;
     }
 
-    public List<Task> getTasks() {
-        return tasks;
+    public List<Taskk> getTaskks() {
+        return taskks;
     }
 
-    public User setTasks(List<Task> tasks) {
-        this.tasks = tasks;
+    public User setTaskks(List<Taskk> taskks) {
+        this.taskks = taskks;
         return this;
     }
 
-    public static class Group extends ExpandableGroup<Task> {
-        public Group(String title, List<Task> items) {
+    public static class Group extends ExpandableGroup<Taskk> {
+        public Group(String title, List<Taskk> items) {
             super(title, items);
         }
     }

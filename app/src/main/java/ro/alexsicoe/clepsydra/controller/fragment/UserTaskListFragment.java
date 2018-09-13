@@ -19,7 +19,6 @@ import android.widget.ProgressBar;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
@@ -33,7 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.model.Task;
+import ro.alexsicoe.clepsydra.model.Taskk;
 import ro.alexsicoe.clepsydra.model.User;
 import ro.alexsicoe.clepsydra.util.DateTimeObserver;
 import ro.alexsicoe.clepsydra.util.DateUtil;
@@ -79,14 +78,14 @@ public class UserTaskListFragment extends Fragment {
     public List<User.Group> mockUsers() {
         List<User.Group> userGroupList = new ArrayList<>();
         for (int k = 0; k < 5; k++) {
-            List<Task> tasks = new ArrayList<>();
+            List<Taskk> taskks = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
-                tasks.add(new Task.Builder("Task" + k, null).isComplete().setSubTasks(null).build());
+                taskks.add(new Taskk.Builder("Taskk" + k, null).isComplete().setSubTasks(null).build());
             }
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",
-                    "Developer", String.valueOf(k), tasks);
-            User.Group userGroup = new User.Group(user.getName(), user.getTasks());
+                    "Developer", String.valueOf(k), taskks);
+            User.Group userGroup = new User.Group(user.getName(), user.getTaskks());
             userGroupList.add(userGroup);
         }
         return userGroupList;
@@ -164,8 +163,8 @@ public class UserTaskListFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Task.Interval interval = new Task.Interval(startDate, finishDate);
-                Task task = new Task.Builder(taskName, interval).build();
+                Taskk.Interval interval = new Taskk.Interval(startDate, finishDate);
+                Taskk taskk = new Taskk.Builder(taskName, interval).build();
                 //TODO
             }
         }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

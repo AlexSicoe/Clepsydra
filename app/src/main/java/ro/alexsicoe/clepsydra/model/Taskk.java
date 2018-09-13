@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import java.util.Date;
 import java.util.List;
 
-public class Task implements Parcelable {
+public class Taskk implements Parcelable {
 
     @NonNull
     private String name;
@@ -16,26 +16,26 @@ public class Task implements Parcelable {
     @NonNull
     private Interval interval;
     @Nullable
-    private List<Task> subTasks;
+    private List<Taskk> subTaskks;
 
-    public Task() {
+    public Taskk() {
     }
 
-    private Task(Parcel in) {
+    private Taskk(Parcel in) {
         name = in.readString();
         complete = in.readByte() != 0;
-        subTasks = in.createTypedArrayList(Task.CREATOR);
+        subTaskks = in.createTypedArrayList(Taskk.CREATOR);
     }
 
-    public static final Creator<Task> CREATOR = new Creator<Task>() {
+    public static final Creator<Taskk> CREATOR = new Creator<Taskk>() {
         @Override
-        public Task createFromParcel(Parcel in) {
-            return new Task(in);
+        public Taskk createFromParcel(Parcel in) {
+            return new Taskk(in);
         }
 
         @Override
-        public Task[] newArray(int size) {
-            return new Task[size];
+        public Taskk[] newArray(int size) {
+            return new Taskk[size];
         }
     };
 
@@ -48,7 +48,7 @@ public class Task implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeByte((byte) (complete ? 1 : 0));
-        dest.writeTypedList(subTasks);
+        dest.writeTypedList(subTaskks);
     }
 
     @NonNull
@@ -78,35 +78,35 @@ public class Task implements Parcelable {
     }
 
     @Nullable
-    public List<Task> getSubTasks() {
-        return subTasks;
+    public List<Taskk> getSubTaskks() {
+        return subTaskks;
     }
 
-    public void setSubTasks(@Nullable List<Task> subTasks) {
-        this.subTasks = subTasks;
+    public void setSubTaskks(@Nullable List<Taskk> subTaskks) {
+        this.subTaskks = subTaskks;
     }
 
     public static class Builder {
-        private Task task;
+        private Taskk taskk;
 
         public Builder(@NonNull String name, @NonNull Interval interval) {
-            this.task = new Task();
-            this.task.name = name;
-            this.task.interval = interval;
+            this.taskk = new Taskk();
+            this.taskk.name = name;
+            this.taskk.interval = interval;
         }
 
         public Builder isComplete() {
-            this.task.complete = true;
+            this.taskk.complete = true;
             return this;
         }
 
-        public Builder setSubTasks(List<Task> subTasks) {
-            this.task.subTasks = subTasks;
+        public Builder setSubTasks(List<Taskk> subTaskks) {
+            this.taskk.subTaskks = subTaskks;
             return this;
         }
 
-        public Task build() {
-            return this.task;
+        public Taskk build() {
+            return this.taskk;
         }
     }
 
