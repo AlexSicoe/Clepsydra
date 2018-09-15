@@ -27,6 +27,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -36,6 +37,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,8 +137,6 @@ public class ProjectListFragment extends Fragment {
                             Log.w(TAG, "Listen failed.", e);
                             return;
                         }
-
-
                         final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
                         assert snapshots != null;
                         for (QueryDocumentSnapshot doc : snapshots) {
@@ -148,17 +148,35 @@ public class ProjectListFragment extends Fragment {
                                 query.addSnapshotListener(new EventListener<QuerySnapshot>() {
                                     @Override
                                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                                        for (QueryDocumentSnapshot doc : snapshots) {
-                                            Project project = doc.toObject(Project.class);
-                                            if (projects.contains(project)) {
+                                        if (e != null) {
+                                            Log.w(TAG, "listen:error", e);
+                                            return;
+                                        }
+                                        if (snapshots != null) {
+                                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                                                Project project = dc.getDocument().toObject(Project.class);
                                                 int index = projects.indexOf(project);
-                                                projects.set(index, project);
-                                                adapter.notifyItemChanged(index);
-                                            } else {
-                                                projects.add(project);
-                                                adapter.notifyItemChanged(projects.size()-1);
+                                                switch (dc.getType()) {
+                                                    case ADDED:
+                                                        if (!projects.contains(project)) {
+                                                            projects.add(project);
+                                                        }
+                                                        break;
+                                                    case MODIFIED:
+                                                        projects.set(index, project);
+                                                        break;
+                                                    case REMOVED:
+                                                        projects.remove(project);
+                                                        break;
+                                                }
                                             }
-                                            Log.d(TAG, project.toString());
+                                            projects.sort(new Comparator<Project>() {
+                                                @Override
+                                                public int compare(Project o1, Project o2) {
+                                                    return o1.getName().compareTo(o2.getName());
+                                                }
+                                            });
+                                            adapter.notifyDataSetChanged();
                                         }
                                     }
                                 });
