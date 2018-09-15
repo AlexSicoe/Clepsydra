@@ -12,7 +12,16 @@ public final class DateUtil {
     private Locale locale;
 
     public DateUtil(Context context) {
-        locale = context.getResources().getConfiguration().locale;
+        if(context != null) {
+            locale = context.getResources().getConfiguration().locale;
+        }
+        else {
+            locale = Locale.US;
+        }
+    }
+
+    public static DateFormat getDefaultDateTimeFormat() {
+        return new SimpleDateFormat(template);
     }
 
     public DateFormat getDateTimeFormat() {
@@ -26,4 +35,6 @@ public final class DateUtil {
     public DateFormat getDateTimeFormat(int datePattern, int timePattern) {
         return SimpleDateFormat.getDateTimeInstance(datePattern, timePattern, locale);
     }
+
+
 }

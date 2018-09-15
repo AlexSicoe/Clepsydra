@@ -57,9 +57,10 @@ public class UserTaskListFragment extends Fragment {
     private UserAdapter adapter;
 
 
-    public static UserTaskListFragment newInstance() {
+    public static UserTaskListFragment newInstance(String projectId) {
         UserTaskListFragment fragment = new UserTaskListFragment();
         Bundle args = new Bundle();
+        args.putSerializable("projectId", projectId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,8 +74,10 @@ public class UserTaskListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         getAccountDetails(context);
 
+
+        String projectId = (String) getArguments().getSerializable("projectId");
         db = FirebaseFirestore.getInstance();
-        tasksRef = db.collection("Tasks");
+        tasksRef = db.collection("Projects").document(projectId).collection("Tasks");
 
         List<User.Group> users = mockUsers();
         adapter = new UserAdapter(users, context);
@@ -159,17 +162,17 @@ public class UserTaskListFragment extends Fragment {
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String taskName = etTaskName.toString();
+                String taskName = etTaskName.getText().toString();
                 Date startDate = null;
                 Date finishDate = null;
                 DateFormat df = new DateUtil(getContext()).getDateTimeFormat();
                 try {
-                    startDate = df.parse(etStartDate.toString());
-                    finishDate = df.parse(etFinishDate.toString());
+                    startDate = df.parse(etStartDate.getText().toString());
+                    finishDate = df.parse(etFinishDate.getText().toString());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-//                createTask(taskName, startDate, finishDate);
+                createTask(taskName, startDate, finishDate);
             }
         }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override

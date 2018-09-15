@@ -65,9 +65,13 @@ public class ProjectActivity extends AppCompatActivity {
         toggle.syncState();
         setNav();
 
+        project = (Project) getIntent().getSerializableExtra("Project");
+        setTitle(project.getName());
+        projectId = project.getId();
+
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.root_layout, UserTaskListFragment.newInstance(), "userTaskListFragment")
+                .add(R.id.root_layout, UserTaskListFragment.newInstance(projectId), "userTaskListFragment")
                 .commit();
 
         View headerView = navView.getHeaderView(0);
@@ -78,11 +82,6 @@ public class ProjectActivity extends AppCompatActivity {
         Picasso.get().load(profilePictureLink).resize(PROFILE_PIC_SIZE, PROFILE_PIC_SIZE).into(ivProfilePicture);
         tvUserName.setText(userName);
         tvEmail.setText(userEmail);
-
-        ////
-        project = (Project) getIntent().getSerializableExtra("Project");
-        setTitle(project.getName());
-        projectId = project.getId();
     }
 
     private void getAccountDetails() {

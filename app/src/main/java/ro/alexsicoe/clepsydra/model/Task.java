@@ -5,31 +5,15 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import ro.alexsicoe.clepsydra.util.DateUtil;
 
 public class Task implements Parcelable {
-
-    @NonNull
-    private String id;
-    @NonNull
-    private String name;
-    private boolean complete;
-    @NonNull
-    private Interval interval;
-    @Nullable
-    private List<Task> subTasks;
-
-    public Task() {
-    }
-
-
-    protected Task(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        complete = in.readByte() != 0;
-        subTasks = in.createTypedArrayList(Task.CREATOR);
-    }
 
     public static final Creator<Task> CREATOR = new Creator<Task>() {
         @Override
@@ -42,6 +26,26 @@ public class Task implements Parcelable {
             return new Task[size];
         }
     };
+    @NonNull
+    private String id;
+    @NonNull
+    private String name;
+    private boolean complete;
+    @NonNull
+    private Interval interval;
+    @Nullable
+    private List<Task> subTasks;
+
+
+    public Task() {
+    }
+
+    protected Task(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        complete = in.readByte() != 0;
+        subTasks = in.createTypedArrayList(Task.CREATOR);
+    }
 
     @NonNull
     public String getId() {
@@ -101,6 +105,17 @@ public class Task implements Parcelable {
         dest.writeTypedList(subTasks);
     }
 
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", complete=" + complete +
+                ", interval=" + interval +
+                ", subTasks=" + subTasks +
+                '}';
+    }
+
     public static class Builder {
         private Task task;
 
@@ -152,6 +167,16 @@ public class Task implements Parcelable {
 
         public void setFinish(Date finish) {
             this.finish = finish;
+        }
+
+        @Override
+        public String toString() {
+            DateFormat df = DateUtil.getDefaultDateTimeFormat();
+//            DateFormat  df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            return "Interval{" +
+                    "start=" + df.format(start) +
+                    ", finish=" + df.format(finish) +
+                    '}';
         }
     }
 }
