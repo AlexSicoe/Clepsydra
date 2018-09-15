@@ -46,7 +46,7 @@ public class UserTaskListFragment extends Fragment {
     ProgressBar progressBar;
 
     private Unbinder unbinder;
-    private FirebaseFirestore rootRef;
+    private FirebaseFirestore db;
     private String userEmail;
     private UserAdapter adapter;
 
@@ -66,7 +66,7 @@ public class UserTaskListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         getAccountDetails(context);
-        rootRef = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         List<User.Group> users = mockUsers();
         adapter = new UserAdapter(users, context);
@@ -107,7 +107,6 @@ public class UserTaskListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //TODO?
     }
 
     @Override

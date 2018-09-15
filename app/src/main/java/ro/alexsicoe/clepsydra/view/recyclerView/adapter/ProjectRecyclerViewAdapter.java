@@ -6,26 +6,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.controller.fragment.ProjectListFragment;
 import ro.alexsicoe.clepsydra.model.Project;
 import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.ProjectViewHolder;
 
 public class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectViewHolder> {
-    private final List<Project> items;
     private Context context;
-    private String userEmail;
+    private final List<Project> items;
 
-    public ProjectRecyclerViewAdapter(List<Project> items, Context context, String userEmail) {
-        this.items = items;
+    public ProjectRecyclerViewAdapter(Context context, List<Project> items) {
         this.context = context;
-        this.userEmail = userEmail;
+        this.items = items;
     }
 
     @Override
@@ -44,10 +38,7 @@ public class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectView
     @Override
     public void onBindViewHolder(@NonNull final ProjectViewHolder holder, int position) {
         Project model = items.get(position);
-        holder.setModel(context, userEmail, model);
+        holder.setModel(context, model);
+
     }
-
-
-
-
 }

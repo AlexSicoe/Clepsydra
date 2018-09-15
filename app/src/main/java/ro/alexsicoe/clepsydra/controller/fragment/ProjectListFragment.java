@@ -24,8 +24,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -63,13 +61,11 @@ public class ProjectListFragment extends Fragment {
     private int columnCount = 1;
     private String userEmail;
     private Unbinder unbinder;
-    private FirebaseFirestore rootRef;
-    private CollectionReference usersRef;
+    private FirebaseFirestore db;
     private CollectionReference projectsRef;
     private CollectionReference userProjectsRef;
     private List<Project> projects;
     private ProjectRecyclerViewAdapter adapter;
-
 
     public static ProjectListFragment newInstance(int columnCount) {
         ProjectListFragment fragment = new ProjectListFragment();
@@ -77,6 +73,10 @@ public class ProjectListFragment extends Fragment {
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 
     @Override
@@ -96,20 +96,19 @@ public class ProjectListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         initLayoutManager(context);
         getAccountDetails(context);
-        rootRef = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        usersRef = rootRef.collection("Users");
-        projectsRef = rootRef.collection("Projects");
-        userProjectsRef = rootRef.collection("UserProjects");
+        projectsRef = db.collection("Projects");
+        userProjectsRef = db.collection("UserProjects");
 
 
-        //TODO debug
         projects = new ArrayList<>();
-        adapter = new ProjectRecyclerViewAdapter(projects, getContext(), userEmail);
+        adapter = new ProjectRecyclerViewAdapter(getContext(), projects);
         recyclerView.setAdapter(adapter);
+        setupTouchHelper();
         readUserProjects();
 
-        initItemTouchHelper();
+
         return view;
     }
 
@@ -117,7 +116,7 @@ public class ProjectListFragment extends Fragment {
         projectsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                for(QueryDocumentSnapshot doc : snapshots) {
+                for (QueryDocumentSnapshot doc : snapshots) {
                     Project project = doc.toObject(Project.class);
                     projects.add(project);
                 }
@@ -129,7 +128,7 @@ public class ProjectListFragment extends Fragment {
     private void readUserProjects() {
 
         userProjectsRef
-                .whereEqualTo("userEmail", userEmail)
+                .whereEqualTo("email", userEmail)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
@@ -137,7 +136,6 @@ public class ProjectListFragment extends Fragment {
                             Log.w(TAG, "Listen failed.", e);
                             return;
                         }
-
 
                         List<Task<QuerySnapshot>> tasks = new ArrayList<>();
                         assert snapshots != null;
@@ -150,32 +148,6 @@ public class ProjectListFragment extends Fragment {
                             }
                         }
 
-                        /*
-                        Task<List<Task<?>>> allTasks = Tasks.whenAllComplete(tasks);
-                        allTasks.addOnCompleteListener(new OnCompleteListener<List<Task<?>>>() {
-                            @Override
-                            public void onComplete(@NonNull Task<List<Task<?>>> task) {
-                                projects.clear();
-                                List<Task<?>> results = task.getResult();
-                                for (Task<?> querySnapshotTask : results) {
-                                    QuerySnapshot snapshots = (QuerySnapshot) querySnapshotTask.getResult();
-                                    for (QueryDocumentSnapshot doc : snapshots) {
-                                        Log.d(TAG, doc.getData().toString());
-                                        Project project = doc.toObject(Project.class);
-                                        projects.add(project);
-                                    }
-                                }
-                                recyclerView.getAdapter().notifyDataSetChanged();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, e.toString());
-                            }
-                        });
-                        */
-
-
                         Task<List<QuerySnapshot>> combinedTask = Tasks.whenAllSuccess(tasks);
                         combinedTask.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
                             @Override
@@ -186,6 +158,7 @@ public class ProjectListFragment extends Fragment {
                                     for (QueryDocumentSnapshot doc : snapshots) {
                                         Project project = doc.toObject(Project.class);
                                         projects.add(project);
+                                        Log.d(TAG, project.toString());
                                     }
                                 }
                                 recyclerView.getAdapter().notifyDataSetChanged();
@@ -196,16 +169,6 @@ public class ProjectListFragment extends Fragment {
                 });
     }
 
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
 
     private void getAccountDetails(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
@@ -262,7 +225,7 @@ public class ProjectListFragment extends Fragment {
 
             private void createUserProject() {
                 Map<String, Object> map = new HashMap<>();
-                map.put("userEmail", userEmail);
+                map.put("email", userEmail);
                 map.put("projectId", projectId);
                 userProjectsRef.add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -284,9 +247,8 @@ public class ProjectListFragment extends Fragment {
         }
     }
 
-
-    private void initItemTouchHelper() {
-        ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+    public void setupTouchHelper() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
@@ -295,12 +257,14 @@ public class ProjectListFragment extends Fragment {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                //TODO delete from rootRef
                 recyclerView.getAdapter().notifyItemRemoved(position);
+                //confirm dialog
+                //TODO project counts users
+                //Delete userProjectDocRef;
+                // --userCount;
+                // if userCount = 0 then delete project //docRef.delete();
             }
-        };
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        }).attachToRecyclerView(recyclerView);
     }
+
 }

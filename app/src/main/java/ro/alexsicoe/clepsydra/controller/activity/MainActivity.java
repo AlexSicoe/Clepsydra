@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private String userEmail, userName;
     private GoogleApiClient googleApiClient;
     private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore rootRef;
+    private FirebaseFirestore db;
     private FirebaseAuth.AuthStateListener authStateListener;
 
     @Override
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         firebaseAuth = FirebaseAuth.getInstance();
-        rootRef = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private void signOut() {
         Map<String, Object> map = new HashMap<>();
         map.put("tokenId", FieldValue.delete());
-        rootRef.collection("Users").document(userEmail).update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection("Users").document(userEmail).update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 firebaseAuth.signOut();

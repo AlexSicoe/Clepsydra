@@ -5,13 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -39,9 +41,8 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public void setModel(final Context context, final String userEmail, final Project model) {
+    public void setModel(final Context context, final Project model) {
         final String id = model.getId();
-
         final String name = model.getName();
         tvProjectName.setText(name);
         String createdBy = context.getString(R.string.created_by) + model.getCreatedBy();
@@ -49,6 +50,10 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
         Date startDate = model.getStart();
         DateFormat df = new DateUtil(context).getDateFormat(DateFormat.MEDIUM);
         tvStartDate.setText(df.format(startDate));
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final DocumentReference docRef = db.
+                collection("Projects").document(id);
+
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,23 +77,14 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
                 et.setHint(R.string.project_name);
                 builder.setView(et);
 
-                final FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
-                        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                                .setTimestampsInSnapshotsEnabled(true)
-                                .build();
-                        rootRef.setFirestoreSettings(settings);
-
-                final Map<String, Object> map = new HashMap<>();
 
                 builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String newProjectName = et.getText().toString().trim();
+                        Map<String, Object> map = new HashMap<>();
                         map.put("name", newProjectName);
-                        rootRef
-                                .collection("projects").document(userEmail)
-                                .collection("userProjects").document(id)
-                                .update(map);
+                        docRef.update(map);
                     }
                 }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
@@ -103,7 +99,8 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        //TODO swipe delete
+
+
     }
 
 

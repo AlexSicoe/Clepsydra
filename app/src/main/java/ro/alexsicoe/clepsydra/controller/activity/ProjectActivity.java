@@ -25,6 +25,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
@@ -32,6 +35,7 @@ import ro.alexsicoe.clepsydra.controller.fragment.UserTaskListFragment;
 import ro.alexsicoe.clepsydra.model.Project;
 
 public class ProjectActivity extends AppCompatActivity {
+    private final int PROFILE_PIC_SIZE = 250;
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
     @BindView(R.id.toolbar)
@@ -41,10 +45,9 @@ public class ProjectActivity extends AppCompatActivity {
     private String userEmail;
     private String userName;
     private Uri profilePictureLink;
-    private final int PROFILE_PIC_SIZE = 250;
     private Project project;
     private String projectId;
-    private FirebaseFirestore rootRef;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +55,7 @@ public class ProjectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_project);
         ButterKnife.bind(this);
         getAccountDetails();
-        rootRef = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
 
         setSupportActionBar(toolbar);
@@ -72,7 +75,7 @@ public class ProjectActivity extends AppCompatActivity {
         TextView tvUserName = headerView.findViewById(R.id.tvUserName);
         TextView tvEmail = headerView.findViewById(R.id.tvEmail);
 
-        Picasso.get().load(profilePictureLink).resize(PROFILE_PIC_SIZE,PROFILE_PIC_SIZE).into(ivProfilePicture);
+        Picasso.get().load(profilePictureLink).resize(PROFILE_PIC_SIZE, PROFILE_PIC_SIZE).into(ivProfilePicture);
         tvUserName.setText(userName);
         tvEmail.setText(userEmail);
 
@@ -109,9 +112,9 @@ public class ProjectActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_manage) {
                     Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_share) {
-                    Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
-                } else if (id == R.id.nav_add) {
                     shareProject();
+                } else if (id == R.id.nav_add) {
+                    Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -135,15 +138,16 @@ public class ProjectActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //duplicating project to friend
                 String friendEmail = et.getText().toString().trim();
-                rootRef.collection("projects").document(friendEmail)
-                        .collection("userProjects").document(projectId)
-                        .set(project);
-            }
-        });
 
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                Map<String, Object> map = new HashMap<>();
+                map.put("email", friendEmail);
+                map.put("projectId", projectId);
+                db.collection("UserProjects").add(map);
+
+                Toast.makeText(ProjectActivity.this, getString(R.string.friend_added_successfully), Toast.LENGTH_SHORT).show();
+            }
+        }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

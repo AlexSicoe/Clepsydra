@@ -24,7 +24,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -37,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private GoogleApiClient googleApiClient;
     private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore rootRef;
+    private FirebaseFirestore db;
     private FirebaseAuth.AuthStateListener authStateListener;
 
     @Override
@@ -62,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         firebaseAuth = FirebaseAuth.getInstance();
-        rootRef = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -116,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
 //                    Taskk<InstanceIdResult> tokenID = FirebaseInstanceId.getInstance().getInstanceId();
 
                     User user = new User(userName, userEmail, null, tokenID, null);
-                    rootRef.collection("Users").document(userEmail).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    db.collection("Users").document(userEmail).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "User successfully created!");
