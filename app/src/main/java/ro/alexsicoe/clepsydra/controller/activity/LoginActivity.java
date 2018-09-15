@@ -112,7 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                     String userEmail = googleSignInAccount.getEmail();
                     String userName = googleSignInAccount.getDisplayName();
                     String tokenID = FirebaseInstanceId.getInstance().getToken();
-//                    Taskk<InstanceIdResult> tokenID = FirebaseInstanceId.getInstance().getInstanceId();
+//                    Task<InstanceIdResult> tokenID = FirebaseInstanceId.getInstance().getInstanceId();
 
                     User user = new User(userName, userEmail, null, tokenID, null);
                     db.collection("Users").document(userEmail).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {

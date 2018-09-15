@@ -97,11 +97,10 @@ public class ProjectListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         initLayoutManager(context);
         getAccountDetails(context);
-        db = FirebaseFirestore.getInstance();
 
+        db = FirebaseFirestore.getInstance();
         projectsRef = db.collection("Projects");
         userProjectsRef = db.collection("UserProjects");
-
 
         projects = new ArrayList<>();
         adapter = new ProjectRecyclerViewAdapter(getContext(), projects);
@@ -111,19 +110,6 @@ public class ProjectListFragment extends Fragment {
 
 
         return view;
-    }
-
-    public void readAllProjects() {
-        projectsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                for (QueryDocumentSnapshot doc : snapshots) {
-                    Project project = doc.toObject(Project.class);
-                    projects.add(project);
-                }
-                recyclerView.getAdapter().notifyDataSetChanged();
-            }
-        });
     }
 
     private void readUserProjects() {
@@ -253,7 +239,6 @@ public class ProjectListFragment extends Fragment {
                 });
             }
         });
-
     }
 
     private void initLayoutManager(Context context) {

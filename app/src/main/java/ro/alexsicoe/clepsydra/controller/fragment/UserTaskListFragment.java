@@ -10,15 +10,20 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
@@ -32,7 +37,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.model.Taskk;
+import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.model.User;
 import ro.alexsicoe.clepsydra.util.DateTimeObserver;
 import ro.alexsicoe.clepsydra.util.DateUtil;
@@ -47,6 +52,7 @@ public class UserTaskListFragment extends Fragment {
 
     private Unbinder unbinder;
     private FirebaseFirestore db;
+    private CollectionReference tasksRef;
     private String userEmail;
     private UserAdapter adapter;
 
@@ -66,7 +72,9 @@ public class UserTaskListFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         getAccountDetails(context);
+
         db = FirebaseFirestore.getInstance();
+        tasksRef = db.collection("Tasks");
 
         List<User.Group> users = mockUsers();
         adapter = new UserAdapter(users, context);
@@ -78,14 +86,14 @@ public class UserTaskListFragment extends Fragment {
     public List<User.Group> mockUsers() {
         List<User.Group> userGroupList = new ArrayList<>();
         for (int k = 0; k < 5; k++) {
-            List<Taskk> taskks = new ArrayList<>();
+            List<Task> tasks = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
-                taskks.add(new Taskk.Builder("Taskk" + k, null).isComplete().setSubTasks(null).build());
+                tasks.add(new Task.Builder("000", "Task" + k, null).isComplete().build());
             }
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",
-                    "Developer", String.valueOf(k), taskks);
-            User.Group userGroup = new User.Group(user.getName(), user.getTaskks());
+                    "Developer", String.valueOf(k), tasks);
+            User.Group userGroup = new User.Group(user.getName(), user.getTasks());
             userGroupList.add(userGroup);
         }
         return userGroupList;
@@ -154,7 +162,6 @@ public class UserTaskListFragment extends Fragment {
                 String taskName = etTaskName.toString();
                 Date startDate = null;
                 Date finishDate = null;
-
                 DateFormat df = new DateUtil(getContext()).getDateTimeFormat();
                 try {
                     startDate = df.parse(etStartDate.toString());
@@ -162,9 +169,7 @@ public class UserTaskListFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Taskk.Interval interval = new Taskk.Interval(startDate, finishDate);
-                Taskk taskk = new Taskk.Builder(taskName, interval).build();
-                //TODO
+//                createTask(taskName, startDate, finishDate);
             }
         }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
@@ -175,6 +180,25 @@ public class UserTaskListFragment extends Fragment {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+
+    private void createTask(String name, Date startDate, Date finishDate) {
+        final String id = tasksRef.document().getId();
+        Task.Interval interval = new Task.Interval(startDate, finishDate);
+        Task task = new Task.Builder(id, name, interval).build();
+        tasksRef.document(id).set(task).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Task added");
+                Toast.makeText(getContext(), R.string.success, Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, e.toString());
+            }
+        });
     }
 
     private void getAccountDetails(Context context) {

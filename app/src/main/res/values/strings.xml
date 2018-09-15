@@ -33,4 +33,5 @@
     <string name="edit_project_name">Edit Project Name</string>
     <string name="update">Update</string>
     <string name="friend_added_successfully">Friend added successfully</string>
+    <string name="success">Success!</string>
 </resources>

@@ -8,47 +8,49 @@ import android.support.annotation.Nullable;
 import java.util.Date;
 import java.util.List;
 
-public class Taskk implements Parcelable {
+public class Task implements Parcelable {
 
+    @NonNull
+    private String id;
     @NonNull
     private String name;
     private boolean complete;
     @NonNull
     private Interval interval;
     @Nullable
-    private List<Taskk> subTaskks;
+    private List<Task> subTasks;
 
-    public Taskk() {
+    public Task() {
     }
 
-    private Taskk(Parcel in) {
+
+    protected Task(Parcel in) {
+        id = in.readString();
         name = in.readString();
         complete = in.readByte() != 0;
-        subTaskks = in.createTypedArrayList(Taskk.CREATOR);
+        subTasks = in.createTypedArrayList(Task.CREATOR);
     }
 
-    public static final Creator<Taskk> CREATOR = new Creator<Taskk>() {
+    public static final Creator<Task> CREATOR = new Creator<Task>() {
         @Override
-        public Taskk createFromParcel(Parcel in) {
-            return new Taskk(in);
+        public Task createFromParcel(Parcel in) {
+            return new Task(in);
         }
 
         @Override
-        public Taskk[] newArray(int size) {
-            return new Taskk[size];
+        public Task[] newArray(int size) {
+            return new Task[size];
         }
     };
 
-    @Override
-    public int describeContents() {
-        return 0;
+    @NonNull
+    public String getId() {
+        return id;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeByte((byte) (complete ? 1 : 0));
-        dest.writeTypedList(subTaskks);
+    public Task setId(@NonNull String id) {
+        this.id = id;
+        return this;
     }
 
     @NonNull
@@ -78,35 +80,49 @@ public class Taskk implements Parcelable {
     }
 
     @Nullable
-    public List<Taskk> getSubTaskks() {
-        return subTaskks;
+    public List<Task> getSubTasks() {
+        return subTasks;
     }
 
-    public void setSubTaskks(@Nullable List<Taskk> subTaskks) {
-        this.subTaskks = subTaskks;
+    public void setSubTasks(@Nullable List<Task> subTasks) {
+        this.subTasks = subTasks;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeByte((byte) (complete ? 1 : 0));
+        dest.writeTypedList(subTasks);
     }
 
     public static class Builder {
-        private Taskk taskk;
+        private Task task;
 
-        public Builder(@NonNull String name, @NonNull Interval interval) {
-            this.taskk = new Taskk();
-            this.taskk.name = name;
-            this.taskk.interval = interval;
+        public Builder(@NonNull String id, @NonNull String name, @NonNull Interval interval) {
+            this.task = new Task();
+            this.task.id = id;
+            this.task.name = name;
+            this.task.interval = interval;
         }
 
         public Builder isComplete() {
-            this.taskk.complete = true;
+            this.task.complete = true;
             return this;
         }
 
-        public Builder setSubTasks(List<Taskk> subTaskks) {
-            this.taskk.subTaskks = subTaskks;
+        public Builder setSubTasks(List<Task> subTasks) {
+            this.task.subTasks = subTasks;
             return this;
         }
 
-        public Taskk build() {
-            return this.taskk;
+        public Task build() {
+            return this.task;
         }
     }
 
