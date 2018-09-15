@@ -26,7 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
@@ -137,34 +136,33 @@ public class ProjectListFragment extends Fragment {
                             return;
                         }
 
-                        List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+
+                        final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
                         assert snapshots != null;
                         for (QueryDocumentSnapshot doc : snapshots) {
                             if (doc.get("projectId") != null) {
                                 String projectId = doc.getString("projectId");
-                                Task<QuerySnapshot> task = projectsRef
-                                        .whereEqualTo("id", projectId).get();
-                                tasks.add(task);
+
+                                final Query query = projectsRef
+                                        .whereEqualTo("id", projectId);
+                                query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                                        for (QueryDocumentSnapshot doc : snapshots) {
+                                            Project project = doc.toObject(Project.class);
+                                            if (projects.contains(project)) {
+                                                int index = projects.indexOf(project);
+                                                projects.set(index, project);
+                                            } else {
+                                                projects.add(project);
+                                            }
+                                            Log.d(TAG, project.toString());
+                                        }
+                                        recyclerView.getAdapter().notifyDataSetChanged();
+                                    }
+                                });
                             }
                         }
-
-                        Task<List<QuerySnapshot>> combinedTask = Tasks.whenAllSuccess(tasks);
-                        combinedTask.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
-                            @Override
-                            public void onSuccess(List<QuerySnapshot> querySnapshots) {
-                                projects.clear();
-                                for (QuerySnapshot snapshots : querySnapshots) {
-                                    Query query = snapshots.getQuery();
-                                    for (QueryDocumentSnapshot doc : snapshots) {
-                                        Project project = doc.toObject(Project.class);
-                                        projects.add(project);
-                                        Log.d(TAG, project.toString());
-                                    }
-                                }
-                                recyclerView.getAdapter().notifyDataSetChanged();
-                            }
-                        });
-
                     }
                 });
     }
