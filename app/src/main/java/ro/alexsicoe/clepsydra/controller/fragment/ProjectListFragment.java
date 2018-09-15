@@ -153,12 +153,13 @@ public class ProjectListFragment extends Fragment {
                                             if (projects.contains(project)) {
                                                 int index = projects.indexOf(project);
                                                 projects.set(index, project);
+                                                adapter.notifyItemChanged(index);
                                             } else {
                                                 projects.add(project);
+                                                adapter.notifyItemChanged(projects.size()-1);
                                             }
                                             Log.d(TAG, project.toString());
                                         }
-                                        recyclerView.getAdapter().notifyDataSetChanged();
                                     }
                                 });
                             }
