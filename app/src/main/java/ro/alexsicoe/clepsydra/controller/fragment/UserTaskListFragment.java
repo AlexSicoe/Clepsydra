@@ -31,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.thoughtbot.expandablerecyclerview.ExpandableListUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -102,9 +103,10 @@ public class UserTaskListFragment extends Fragment {
         return view;
     }
 
-    public void readUsers() {
-        final List<User> users = new ArrayList<>();
 
+    public void readUsers() {
+
+        final List<User> users = new ArrayList<>();
         adapter = new UserAdapter(userGroups, getContext());
         recyclerView.setAdapter(adapter);
 
@@ -113,6 +115,9 @@ public class UserTaskListFragment extends Fragment {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        users.clear();
+                        userGroups.clear();
+
                         if (e != null) {
                             Log.w(TAG, "Listen failed.", e);
                             return;
@@ -129,6 +134,7 @@ public class UserTaskListFragment extends Fragment {
                                             Log.w(TAG, "listen:error", e);
                                             return;
                                         }
+
                                         if (snapshots != null) {
                                             for (DocumentChange dc : snapshots.getDocumentChanges()) {
                                                 User user = dc.getDocument().toObject(User.class);
@@ -161,9 +167,8 @@ public class UserTaskListFragment extends Fragment {
                                                 }
                                             }
                                             //TODO sort
-                                            //TODO this creates the adapter again and again, because notifying doesn't work.
-                                            adapter = new UserAdapter(userGroups, getContext());
-                                            recyclerView.setAdapter(adapter);
+                                            ExpandableListUtils.notifyGroupDataChanged(adapter);
+                                            adapter.notifyDataSetChanged();
                                         }
                                     }
                                 });
@@ -179,7 +184,7 @@ public class UserTaskListFragment extends Fragment {
         for (int k = 0; k < 5; k++) {
             List<Task> tasks = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
-//                tasks.add(new Task.Builder("000", "Task" + k, null).isComplete().build());
+                tasks.add(new Task.Builder("000", "Task" + k, null).isComplete().build());
             }
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",

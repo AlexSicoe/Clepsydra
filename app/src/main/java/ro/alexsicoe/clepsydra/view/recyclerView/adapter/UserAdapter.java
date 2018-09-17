@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.thoughtbot.expandablerecyclerview.ExpandableListUtils;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
@@ -12,9 +13,9 @@ import java.util.List;
 
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
+import ro.alexsicoe.clepsydra.model.User;
 import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.TaskViewHolder;
 import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.UserViewHolder;
-import ro.alexsicoe.clepsydra.model.User;
 
 public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, TaskViewHolder> {
 
@@ -48,5 +49,11 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
     @Override
     public void onBindGroupViewHolder(UserViewHolder holder, int flatPosition, ExpandableGroup group) {
         holder.setTitle(group);
+    }
+
+    public void addAll(List<User.Group> groups) {
+        ((List<User.Group>) getGroups()).addAll(groups);
+        ExpandableListUtils.notifyGroupDataChanged(this);
+        notifyDataSetChanged();
     }
 }
