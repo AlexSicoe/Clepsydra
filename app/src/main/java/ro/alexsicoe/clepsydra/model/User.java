@@ -87,9 +87,51 @@ public class User {
                 '}';
     }
 
-    public static class Group extends ExpandableGroup<Task> {
-        public Group(String title, List<Task> items) {
-            super(title, items);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return email.equals(user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return email.hashCode();
+    }
+
+    public static class GroupItem extends ExpandableGroup<Task> {
+        private User user;
+
+        public GroupItem(User user) {
+            super(user.getName(), user.getTasks());
+            this.user = user;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public GroupItem setUser(User user) {
+            this.user = user;
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            GroupItem groupItem = (GroupItem) o;
+            return user.equals(groupItem.user);
+        }
+
+        @Override
+        public int hashCode() {
+            return user.hashCode();
         }
     }
 }

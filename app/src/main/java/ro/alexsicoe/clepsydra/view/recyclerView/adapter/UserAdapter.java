@@ -42,7 +42,7 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
 
     @Override
     public void onBindChildViewHolder(TaskViewHolder holder, int flatPosition, ExpandableGroup group, int childIndex) {
-        final Task task = ((User.Group) group).getItems().get(childIndex);
+        final Task task = ((User.GroupItem) group).getItems().get(childIndex);
         holder.onBind(task);
     }
 
@@ -51,8 +51,8 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
         holder.setTitle(group);
     }
 
-    public void addAll(List<User.Group> groups) {
-        ((List<User.Group>) getGroups()).addAll(groups);
+    public void addAll(List<User.GroupItem> groupItems) {
+        ((List<User.GroupItem>) getGroups()).addAll(groupItems);
         ExpandableListUtils.notifyGroupDataChanged(this);
         notifyDataSetChanged();
     }

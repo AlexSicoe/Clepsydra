@@ -31,7 +31,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.thoughtbot.expandablerecyclerview.ExpandableListUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -66,7 +65,7 @@ public class UserTaskListFragment extends Fragment {
     private CollectionReference userProjectsRef;
     private String projectId;
 
-    private List<User.Group> userGroups;
+    private List<User.GroupItem> items;
 
 
     public static UserTaskListFragment newInstance(String projectId) {
@@ -94,10 +93,9 @@ public class UserTaskListFragment extends Fragment {
         userProjectsRef = db.collection("UserProjects");
 
 
-        userGroups = new ArrayList<>();
-        adapter = new UserAdapter(userGroups, getContext());
+        items = new ArrayList<>();
+        adapter = new UserAdapter(items, getContext());
         recyclerView.setAdapter(adapter);
-
         readUsers();
 //        mockUsers();
         return view;
@@ -105,23 +103,18 @@ public class UserTaskListFragment extends Fragment {
 
 
     public void readUsers() {
-
-        final List<User> users = new ArrayList<>();
-        adapter = new UserAdapter(userGroups, getContext());
-        recyclerView.setAdapter(adapter);
-
         userProjectsRef
                 .whereEqualTo("projectId", projectId)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                        users.clear();
-                        userGroups.clear();
+                        items.clear();
 
                         if (e != null) {
                             Log.w(TAG, "Listen failed.", e);
                             return;
                         }
+                        assert snapshots != null;
                         for (QueryDocumentSnapshot doc : snapshots) {
                             if (doc.get("email") != null) {
                                 String email = doc.getString("email");
@@ -138,37 +131,29 @@ public class UserTaskListFragment extends Fragment {
                                         if (snapshots != null) {
                                             for (DocumentChange dc : snapshots.getDocumentChanges()) {
                                                 User user = dc.getDocument().toObject(User.class);
-                                                int index = users.indexOf(user);
-                                                List<Task> mockTasks = new ArrayList<>();
-                                                User.Group userGroup = new User.Group(user.getName(), mockTasks);
+                                                User.GroupItem item = new User.GroupItem(user);
+                                                int index = items.indexOf(item);
+                                                user.setTasks(new ArrayList<>()); // mock tasks
 
                                                 switch (dc.getType()) {
                                                     case ADDED:
+                                                        items.add(item);
                                                         Log.d(TAG, "ADDED: " + user.toString());
-                                                        if (!users.contains(user)) {
-                                                            users.add(user);
-                                                            userGroups.add(userGroup);
-//                                                            adapter.notifyItemInserted(users.size() - 1);
-//                                                            adapter.notifyDataSetChanged();
-                                                        }
+                                                        adapter.notifyItemInserted(items.size() - 1);
                                                         break;
                                                     case MODIFIED:
                                                         Log.d(TAG, "MODIFIED: " + user.toString());
-                                                        users.set(index, user);
-                                                        userGroups.set(index, userGroup);
-//                                                        adapter.notifyItemChanged(index);
+                                                        items.set(index, item);
+                                                        adapter.notifyItemChanged(index);
                                                         break;
                                                     case REMOVED:
                                                         Log.d(TAG, "REMOVED: " + user.toString());
-                                                        users.remove(user);
-                                                        userGroups.remove(userGroup);
-//                                                        adapter.notifyItemRemoved(index);
+                                                        items.remove(item);
+                                                        adapter.notifyItemRemoved(index);
                                                         break;
                                                 }
                                             }
                                             //TODO sort
-                                            ExpandableListUtils.notifyGroupDataChanged(adapter);
-                                            adapter.notifyDataSetChanged();
                                         }
                                     }
                                 });
@@ -189,11 +174,9 @@ public class UserTaskListFragment extends Fragment {
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",
                     "Developer", String.valueOf(k), tasks);
-            User.Group userGroup = new User.Group(user.getName(), user.getTasks());
-            userGroups.add(userGroup);
+            User.GroupItem userGroupItem = new User.GroupItem(user);
+            items.add(userGroupItem);
         }
-        adapter = new UserAdapter(userGroups, getContext());
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
