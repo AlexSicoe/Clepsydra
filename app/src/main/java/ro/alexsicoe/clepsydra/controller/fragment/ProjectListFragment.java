@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -123,7 +122,6 @@ public class ProjectListFragment extends Fragment {
                             Log.w(TAG, "Listen failed.", e);
                             return;
                         }
-                        final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
                         assert snapshots != null;
                         for (QueryDocumentSnapshot doc : snapshots) {
                             if (doc.get("projectId") != null) {

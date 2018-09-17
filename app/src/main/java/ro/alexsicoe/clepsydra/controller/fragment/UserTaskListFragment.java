@@ -24,7 +24,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -53,8 +59,13 @@ public class UserTaskListFragment extends Fragment {
     private Unbinder unbinder;
     private FirebaseFirestore db;
     private CollectionReference tasksRef;
+    private CollectionReference usersRef;
     private String userEmail;
     private UserAdapter adapter;
+    private CollectionReference userProjectsRef;
+    private String projectId;
+
+    private List<User.Group> userGroups;
 
 
     public static UserTaskListFragment newInstance(String projectId) {
@@ -75,31 +86,109 @@ public class UserTaskListFragment extends Fragment {
         getAccountDetails(context);
 
 
-        String projectId = (String) getArguments().getSerializable("projectId");
+        projectId = (String) getArguments().getSerializable("projectId");
         db = FirebaseFirestore.getInstance();
         tasksRef = db.collection("Projects").document(projectId).collection("Tasks");
+        usersRef = db.collection("Users");
+        userProjectsRef = db.collection("UserProjects");
 
-        List<User.Group> users = mockUsers();
-        adapter = new UserAdapter(users, context);
+
+        userGroups = new ArrayList<>();
+        adapter = new UserAdapter(userGroups, getContext());
         recyclerView.setAdapter(adapter);
+
+        readUsers();
+//        mockUsers();
         return view;
     }
 
+    public void readUsers() {
+        final List<User> users = new ArrayList<>();
 
-    public List<User.Group> mockUsers() {
-        List<User.Group> userGroupList = new ArrayList<>();
+        adapter = new UserAdapter(userGroups, getContext());
+        recyclerView.setAdapter(adapter);
+
+        userProjectsRef
+                .whereEqualTo("projectId", projectId)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            if (doc.get("email") != null) {
+                                String email = doc.getString("email");
+                                Query query = usersRef
+                                        .whereEqualTo("email", email);
+                                query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                                        if (e != null) {
+                                            Log.w(TAG, "listen:error", e);
+                                            return;
+                                        }
+                                        if (snapshots != null) {
+                                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                                                User user = dc.getDocument().toObject(User.class);
+                                                int index = users.indexOf(user);
+                                                List<Task> mockTasks = new ArrayList<>();
+                                                User.Group userGroup = new User.Group(user.getName(), mockTasks);
+
+                                                switch (dc.getType()) {
+                                                    case ADDED:
+                                                        Log.d(TAG, "ADDED: " + user.toString());
+                                                        if (!users.contains(user)) {
+                                                            users.add(user);
+                                                            userGroups.add(userGroup);
+//                                                            adapter.notifyItemInserted(users.size() - 1);
+//                                                            adapter.notifyDataSetChanged();
+                                                        }
+                                                        break;
+                                                    case MODIFIED:
+                                                        Log.d(TAG, "MODIFIED: " + user.toString());
+                                                        users.set(index, user);
+                                                        userGroups.set(index, userGroup);
+//                                                        adapter.notifyItemChanged(index);
+                                                        break;
+                                                    case REMOVED:
+                                                        Log.d(TAG, "REMOVED: " + user.toString());
+                                                        users.remove(user);
+                                                        userGroups.remove(userGroup);
+//                                                        adapter.notifyItemRemoved(index);
+                                                        break;
+                                                }
+                                            }
+                                            //TODO sort
+                                            //TODO this creates the adapter again and again, because notifying doesn't work.
+                                            adapter = new UserAdapter(userGroups, getContext());
+                                            recyclerView.setAdapter(adapter);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
+
+    }
+
+    public void mockUsers() {
         for (int k = 0; k < 5; k++) {
             List<Task> tasks = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
-                tasks.add(new Task.Builder("000", "Task" + k, null).isComplete().build());
+//                tasks.add(new Task.Builder("000", "Task" + k, null).isComplete().build());
             }
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",
                     "Developer", String.valueOf(k), tasks);
             User.Group userGroup = new User.Group(user.getName(), user.getTasks());
-            userGroupList.add(userGroup);
+            userGroups.add(userGroup);
         }
-        return userGroupList;
+        adapter = new UserAdapter(userGroups, getContext());
+        recyclerView.setAdapter(adapter);
     }
 
     @Override

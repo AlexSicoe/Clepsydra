@@ -76,6 +76,17 @@ public class User {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", position='" + position + '\'' +
+                ", tokenId='" + tokenId + '\'' +
+                ", tasks=" + tasks +
+                '}';
+    }
+
     public static class Group extends ExpandableGroup<Task> {
         public Group(String title, List<Task> items) {
             super(title, items);
