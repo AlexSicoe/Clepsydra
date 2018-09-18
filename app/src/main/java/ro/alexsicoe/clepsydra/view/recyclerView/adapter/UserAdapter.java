@@ -21,6 +21,7 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
 
     Context context;
 
+
     public UserAdapter(List<? extends ExpandableGroup> groups, Context context) {
         super(groups);
         this.context = context;
@@ -48,7 +49,7 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
 
     @Override
     public void onBindGroupViewHolder(UserViewHolder holder, int flatPosition, ExpandableGroup group) {
-        holder.setTitle(group);
+        holder.setViewHolder((User.GroupItem) group);
     }
 
     public void addAll(List<User.GroupItem> groupItems) {

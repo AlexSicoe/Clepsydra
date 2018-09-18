@@ -34,4 +34,5 @@
     <string name="update">Update</string>
     <string name="friend_added_successfully">Friend added successfully</string>
     <string name="success">Success!</string>
+    <string name="plusSign">+</string>
 </resources>

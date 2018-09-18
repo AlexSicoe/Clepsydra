@@ -10,16 +10,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8sp"
-        android:layout_marginStart="8sp"
+        android:layout_alignStart="@id/view"
         android:layout_marginTop="8sp"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         tools:text="John Doe" />
 
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/tvUserName"
+        android:layout_below="@id/tvUserName"
+        tools:text="johnDoe@gmail.com" />
+
+    <Button
+        android:id="@+id/btnAddTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/view"
+        android:layout_marginTop="5sp"
+        android:text="@string/plusSign" />
+
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@+id/tvUserName"
+        android:layout_below="@+id/tvEmail"
         android:layout_margin="8sp"
         android:background="@android:color/darker_gray" />
 
