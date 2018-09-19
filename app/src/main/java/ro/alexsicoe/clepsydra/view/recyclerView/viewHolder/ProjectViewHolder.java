@@ -5,27 +5,23 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.TextView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import ro.alexsicoe.clepsydra.R;
+import ro.alexsicoe.clepsydra.controller.activity.ProjectActivity;
+import ro.alexsicoe.clepsydra.model.Project;
+import ro.alexsicoe.clepsydra.util.DateUtil;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.controller.activity.ProjectActivity;
-import ro.alexsicoe.clepsydra.model.Project;
-import ro.alexsicoe.clepsydra.util.DateUtil;
 
 public class ProjectViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.tvProjectName)
@@ -98,9 +94,6 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
                 return true;
             }
         });
-
-
-
     }
 
 

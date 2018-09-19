@@ -1,6 +1,5 @@
 package ro.alexsicoe.clepsydra.controller.fragment;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,41 +7,26 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.firestore.*;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.model.User;
-import ro.alexsicoe.clepsydra.util.DateTimeObserver;
-import ro.alexsicoe.clepsydra.util.DateUtil;
 import ro.alexsicoe.clepsydra.view.recyclerView.adapter.UserAdapter;
-import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.UserViewHolder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserTaskListFragment extends Fragment {
     private static final String TAG = UserTaskListFragment.class.getSimpleName();
@@ -60,11 +44,7 @@ public class UserTaskListFragment extends Fragment {
     private CollectionReference userProjectsRef;
     private CollectionReference tasksRef;
     private String projectId;
-
     private List<User.GroupItem> items;
-
-    private UserViewHolder.IAddTask iAddTask;
-
 
     public static UserTaskListFragment newInstance(String projectId) {
         UserTaskListFragment fragment = new UserTaskListFragment();
@@ -73,6 +53,7 @@ public class UserTaskListFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Nullable
     @Override
@@ -90,66 +71,20 @@ public class UserTaskListFragment extends Fragment {
         usersRef = db.collection("Users");
         userProjectsRef = db.collection("UserProjects");
 
-        iAddTask = user -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle(R.string.create_task);
-
-            LinearLayout layout = new LinearLayout(getContext());
-            layout.setOrientation(LinearLayout.VERTICAL);
-
-            final EditText etTaskName = new EditText(getContext());
-            etTaskName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-            etTaskName.setHint(R.string.task_name);
-
-            final EditText etStartDate = new EditText(getContext());
-            final EditText etFinishDate = new EditText(getContext());
-            etStartDate.setFocusable(false);
-            etFinishDate.setFocusable(false);
-            etStartDate.setHint(R.string.start_date);
-            etFinishDate.setHint(R.string.finish_date);
-
-            DateTimeObserver dateTimeObserver = new DateTimeObserver(getContext());
-            etStartDate.setOnClickListener(dateTimeObserver);
-            etFinishDate.setOnClickListener(dateTimeObserver);
-
-            layout.addView(etTaskName);
-            layout.addView(etStartDate);
-            layout.addView(etFinishDate);
-            builder.setView(layout);
-
-            builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                String taskName = etTaskName.getText().toString();
-                Date startDate = null;
-                Date finishDate = null;
-                DateFormat df = new DateUtil(getContext()).getDateTimeFormat();
-                try {
-                    startDate = df.parse(etStartDate.getText().toString());
-                    finishDate = df.parse(etFinishDate.getText().toString());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                final String id = tasksRef.document().getId();
-                Task.Interval interval = new Task.Interval(startDate, finishDate);
-                Task task = new Task.Builder(id, taskName, interval).build();
-                tasksRef.document(id).set(task).addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Task added");
-                    Toast.makeText(getContext(), R.string.success, Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> Log.w(TAG, e.toString()));
-
-
-            }).setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
-
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-        };
 
         items = new ArrayList<>();
-        adapter = new UserAdapter(items, getContext());
+        adapter = new UserAdapter(items, getContext(), user -> addTask(user));
         recyclerView.setAdapter(adapter);
         readUsers();
+
 //        mockUsers();
         return view;
+    }
+
+    private void addTask(User user) {
+        if (user != null) {
+            Toast.makeText(getContext(), user.getEmail(), Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -264,6 +199,16 @@ public class UserTaskListFragment extends Fragment {
         if (googleSignInAccount != null) {
             userEmail = googleSignInAccount.getEmail();
         }
+    }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+
+    @FunctionalInterface
+    public interface AddTaskListener {
+        void onAddTask(User user);
     }
 
 
