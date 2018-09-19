@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import butterknife.BindView;
@@ -24,9 +28,14 @@ import com.thoughtbot.expandablerecyclerview.ExpandableListUtils;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.model.User;
+import ro.alexsicoe.clepsydra.util.DateTimeObserver;
+import ro.alexsicoe.clepsydra.util.DateUtil;
 import ro.alexsicoe.clepsydra.view.recyclerView.adapter.UserAdapter;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class UserTaskListFragment extends Fragment {
@@ -40,7 +49,7 @@ public class UserTaskListFragment extends Fragment {
     private FirebaseFirestore db;
 
     private CollectionReference usersRef;
-    private String userEmail;
+    private String loggedUserEmail;
     private UserAdapter adapter;
     private CollectionReference userProjectsRef;
     private CollectionReference tasksRef;
@@ -83,7 +92,58 @@ public class UserTaskListFragment extends Fragment {
     }
 
     private void addTask(User user) {
-        Toast.makeText(getContext(), user.getEmail(), Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserTaskListFragment.this.getContext());
+        builder.setTitle(R.string.create_task);
+
+        LinearLayout layout = new LinearLayout(UserTaskListFragment.this.getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        final EditText etTaskName = new EditText(UserTaskListFragment.this.getContext());
+        etTaskName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        etTaskName.setHint(R.string.task_name);
+
+        final EditText etStartDate = new EditText(UserTaskListFragment.this.getContext());
+        final EditText etFinishDate = new EditText(UserTaskListFragment.this.getContext());
+        etStartDate.setFocusable(false);
+        etFinishDate.setFocusable(false);
+        etStartDate.setHint(R.string.start_date);
+        etFinishDate.setHint(R.string.finish_date);
+
+        DateTimeObserver dateTimeObserver = new DateTimeObserver(UserTaskListFragment.this.getContext());
+        etStartDate.setOnClickListener(dateTimeObserver);
+        etFinishDate.setOnClickListener(dateTimeObserver);
+
+        layout.addView(etTaskName);
+        layout.addView(etStartDate);
+        layout.addView(etFinishDate);
+        builder.setView(layout);
+
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            String taskName = etTaskName.getText().toString();
+            Date startDate = null;
+            Date finishDate = null;
+            DateFormat df = new DateUtil(UserTaskListFragment.this.getContext()).getDateTimeFormat();
+            try {
+                startDate = df.parse(etStartDate.getText().toString());
+                finishDate = df.parse(etFinishDate.getText().toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            final String id = tasksRef.document().getId();
+            Task.Interval interval = new Task.Interval(startDate, finishDate);
+            Task task = new Task.Builder(id, taskName, user.getEmail(), interval).build();
+
+            tasksRef.document(id).set(task).addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Task added");
+                Toast.makeText(UserTaskListFragment.this.getContext(), R.string.success, Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> Log.w(TAG, e.toString()));
+
+
+        }).setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
 
@@ -158,7 +218,7 @@ public class UserTaskListFragment extends Fragment {
         for (int k = 0; k < 5; k++) {
             List<Task> tasks = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
-                tasks.add(new Task.Builder("000", "Task" + k, null).isComplete().build());
+                tasks.add(new Task.Builder("000", "Task" + k, "fake@mail.com", null).isComplete().build());
             }
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",
@@ -197,14 +257,9 @@ public class UserTaskListFragment extends Fragment {
     private void getAccountDetails(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
         if (googleSignInAccount != null) {
-            userEmail = googleSignInAccount.getEmail();
+            loggedUserEmail = googleSignInAccount.getEmail();
         }
     }
-
-    public String getProjectId() {
-        return projectId;
-    }
-
 
     @FunctionalInterface
     public interface AddTaskListener {

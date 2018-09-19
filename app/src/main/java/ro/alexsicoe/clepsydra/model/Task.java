@@ -4,17 +4,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
 import ro.alexsicoe.clepsydra.util.DateUtil;
 
-public class Task implements Parcelable {
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
 
+public class Task implements Parcelable {
     public static final Creator<Task> CREATOR = new Creator<Task>() {
         @Override
         public Task createFromParcel(Parcel in) {
@@ -30,6 +26,8 @@ public class Task implements Parcelable {
     private String id;
     @NonNull
     private String name;
+    @NonNull
+    private String ownerEmail;
     private boolean complete;
     @NonNull
     private Interval interval;
@@ -43,6 +41,7 @@ public class Task implements Parcelable {
     protected Task(Parcel in) {
         id = in.readString();
         name = in.readString();
+        ownerEmail = in.readString();
         complete = in.readByte() != 0;
         subTasks = in.createTypedArrayList(Task.CREATOR);
     }
@@ -64,6 +63,16 @@ public class Task implements Parcelable {
 
     public void setName(@NonNull String name) {
         this.name = name;
+    }
+
+    @NonNull
+    public String getOwnerEmail() {
+        return ownerEmail;
+    }
+
+    public Task setOwnerEmail(@NonNull String ownerEmail) {
+        this.ownerEmail = ownerEmail;
+        return this;
     }
 
     public boolean isComplete() {
@@ -101,29 +110,21 @@ public class Task implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(name);
+        dest.writeString(ownerEmail);
         dest.writeByte((byte) (complete ? 1 : 0));
         dest.writeTypedList(subTasks);
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", complete=" + complete +
-                ", interval=" + interval +
-                ", subTasks=" + subTasks +
-                '}';
-    }
 
     public static class Builder {
         private Task task;
 
-        public Builder(@NonNull String id, @NonNull String name, @NonNull Interval interval) {
+        public Builder(@NonNull String id, @NonNull String name, @NonNull String ownerEmail, @NonNull Interval interval) {
             this.task = new Task();
             this.task.id = id;
             this.task.name = name;
             this.task.interval = interval;
+            this.task.ownerEmail = ownerEmail;
         }
 
         public Builder isComplete() {
