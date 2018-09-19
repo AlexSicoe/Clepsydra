@@ -6,5 +6,6 @@ public class ExpandableListUtils {
         for (int i = 0; i < adapter.getGroups().size(); i++) {
             adapter.expandableList.expandedGroupIndexes[i] = false;
         }
+        adapter.notifyDataSetChanged();
     }
 }

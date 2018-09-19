@@ -20,6 +20,7 @@ import butterknife.Unbinder;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.firestore.*;
+import com.thoughtbot.expandablerecyclerview.ExpandableListUtils;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.model.User;
@@ -82,9 +83,7 @@ public class UserTaskListFragment extends Fragment {
     }
 
     private void addTask(User user) {
-        if (user != null) {
-            Toast.makeText(getContext(), user.getEmail(), Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(getContext(), user.getEmail(), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -129,21 +128,22 @@ public class UserTaskListFragment extends Fragment {
                         case ADDED:
                             items.add(item);
                             Log.d(TAG, "ADDED: " + user.toString());
-                            adapter.notifyItemInserted(items.size() - 1);
+//                            adapter.notifyItemInserted(items.size() - 1);
                             break;
                         case MODIFIED:
                             Log.d(TAG, "MODIFIED: " + user.toString());
                             items.set(index, item);
-                            adapter.notifyItemChanged(index);
+//                            adapter.notifyItemChanged(index);
                             break;
                         case REMOVED:
                             Log.d(TAG, "REMOVED: " + user.toString());
                             items.remove(item);
-                            adapter.notifyItemRemoved(index);
+//                            adapter.notifyItemRemoved(index);
                             break;
                     }
                 }
                 //TODO sort
+                ExpandableListUtils.notifyGroupDataChanged(adapter);
             }
         });
     }

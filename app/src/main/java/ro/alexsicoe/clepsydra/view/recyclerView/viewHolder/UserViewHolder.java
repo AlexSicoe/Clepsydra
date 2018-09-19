@@ -39,8 +39,7 @@ public class UserViewHolder extends GroupViewHolder {
 
     @OnClick(R.id.btnAddTask)
     public void onClick(View v) {
-//        Toast.makeText(v.getContext(), user.getEmail(), Toast.LENGTH_SHORT).show();
-        //TODO De aici trebuie sa transmit userul catre fragment
+        //Sends user to fragment
         addTaskListener.onAddTask(user);
     }
 
