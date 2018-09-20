@@ -17,26 +17,32 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.thoughtbot.expandablerecyclerview.ExpandableListUtils;
-import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.model.Task;
-import ro.alexsicoe.clepsydra.model.User;
-import ro.alexsicoe.clepsydra.util.DateTimeObserver;
-import ro.alexsicoe.clepsydra.util.DateUtil;
-import ro.alexsicoe.clepsydra.view.recyclerView.adapter.UserAdapter;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+import ro.alexsicoe.clepsydra.R;
+import ro.alexsicoe.clepsydra.model.Task;
+import ro.alexsicoe.clepsydra.model.User;
+import ro.alexsicoe.clepsydra.util.DateTimeObserver;
+import ro.alexsicoe.clepsydra.util.DateUtil;
+import ro.alexsicoe.clepsydra.view.recyclerView.adapter.UserAdapter;
 
 public class UserTaskListFragment extends Fragment {
     private static final String TAG = UserTaskListFragment.class.getSimpleName();
@@ -86,9 +92,126 @@ public class UserTaskListFragment extends Fragment {
         adapter = new UserAdapter(items, getContext(), user -> addTask(user));
         recyclerView.setAdapter(adapter);
         readUsers();
+//        readMockUsers();
 
-//        mockUsers();
         return view;
+    }
+
+    public void readMockUsers() {
+        for (int k = 0; k < 5; k++) {
+            List<Task> tasks = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                Task.Interval interval = new Task.Interval(new Date(), new Date());
+                tasks.add(new Task.Builder("000", "Task" + k, "fake@mail.com", interval).isComplete().build());
+            }
+            User user = new User("MockUser" + k,
+                    "user" + k + "@gmail.com",
+                    "Developer", String.valueOf(k), tasks);
+            User.GroupItem userGroupItem = new User.GroupItem(user);
+            items.add(userGroupItem);
+        }
+        ExpandableListUtils.notifyGroupDataChanged(adapter);
+    }
+
+
+    private void readUsers() {
+        Query query = userProjectsRef
+                .whereEqualTo("projectId", projectId);
+        query.addSnapshotListener((snapshots, e) -> {
+            items.clear();
+
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+            assert snapshots != null;
+            for (QueryDocumentSnapshot doc : snapshots) {
+                if (doc.get("email") != null) {
+                    String email = doc.getString("email");
+                    queryUsers(email);
+                }
+            }
+        });
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
+    private void queryUsers(String email) {
+        Query query = usersRef
+                .whereEqualTo("email", email);
+        query.addSnapshotListener((snapshots, e) -> {
+            if (e != null) {
+                Log.w(TAG, "listen:error", e);
+                return;
+            }
+
+            if (snapshots != null) {
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    User user = dc.getDocument().toObject(User.class);
+                    queryUserTasks(user, tasks -> {
+                        user.setTasks(tasks);
+                        User.GroupItem item = new User.GroupItem(user);
+                        int index = items.indexOf(item);
+
+                        switch (dc.getType()) {
+                            case ADDED:
+                                items.add(item);
+                                Log.d(TAG, "ADDED: " + user.toString());
+//                            adapter.notifyItemInserted(items.size() - 1);
+                                break;
+                            case MODIFIED:
+                                Log.d(TAG, "MODIFIED: " + user.toString());
+                                items.set(index, item);
+//                            adapter.notifyItemChanged(index);
+                                break;
+                            case REMOVED:
+                                Log.d(TAG, "REMOVED: " + user.toString());
+                                items.remove(item);
+//                            adapter.notifyItemRemoved(index);
+                                break;
+                        }
+                        ExpandableListUtils.notifyGroupDataChanged(adapter);
+                    });
+
+                }
+                //TODO sort
+            }
+        });
+
+
+    }
+
+    private void queryUserTasks(User user, OnReadTasksCallback callback) {
+        List<Task> tasks = new ArrayList<>();
+        tasksRef.whereEqualTo("ownerEmail", user.getEmail())
+                .orderBy("name", Query.Direction.ASCENDING)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "listen:error", e);
+                        return;
+                    }
+
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        Task task = dc.getDocument().toObject(Task.class);
+                        int index = items.indexOf(task);
+
+                        switch (dc.getType()) {
+                            case ADDED:
+                                Log.d(TAG, "ADDED: " + task.toString());
+                                tasks.add(task);
+                                break;
+                            case MODIFIED:
+                                Log.d(TAG, "MODIFIED: " + task.toString());
+                                tasks.set(index, task);
+                                break;
+                            case REMOVED:
+                                Log.d(TAG, "REMOVED: " + task.toString());
+                                tasks.remove(task);
+                                break;
+                        }
+                    }
+                    ExpandableListUtils.notifyGroupDataChanged(adapter); // TODO ?
+                    callback.onReadTasks(tasks);
+                });
     }
 
     private void addTask(User user) {
@@ -146,101 +269,17 @@ public class UserTaskListFragment extends Fragment {
         alertDialog.show();
     }
 
-
-    private void readUsers() {
-        Query query = userProjectsRef
-                .whereEqualTo("projectId", projectId);
-        query.addSnapshotListener((snapshots, e) -> {
-            items.clear();
-
-            if (e != null) {
-                Log.w(TAG, "Listen failed.", e);
-                return;
-            }
-            assert snapshots != null;
-            for (QueryDocumentSnapshot doc : snapshots) {
-                if (doc.get("email") != null) {
-                    String email = doc.getString("email");
-                    queryUsers(email);
-                }
-            }
-        });
-    }
-
-    private void queryUsers(String email) {
-        Query query = usersRef
-                .whereEqualTo("email", email);
-        query.addSnapshotListener((snapshots, e) -> {
-            if (e != null) {
-                Log.w(TAG, "listen:error", e);
-                return;
-            }
-
-            if (snapshots != null) {
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    User user = dc.getDocument().toObject(User.class);
-                    User.GroupItem item = new User.GroupItem(user);
-                    int index = items.indexOf(item);
-                    user.setTasks(new ArrayList<>()); // mock tasks
-
-
-                    switch (dc.getType()) {
-                        case ADDED:
-                            items.add(item);
-                            Log.d(TAG, "ADDED: " + user.toString());
-//                            adapter.notifyItemInserted(items.size() - 1);
-                            break;
-                        case MODIFIED:
-                            Log.d(TAG, "MODIFIED: " + user.toString());
-                            items.set(index, item);
-//                            adapter.notifyItemChanged(index);
-                            break;
-                        case REMOVED:
-                            Log.d(TAG, "REMOVED: " + user.toString());
-                            items.remove(item);
-//                            adapter.notifyItemRemoved(index);
-                            break;
-                    }
-                }
-                //TODO sort
-                ExpandableListUtils.notifyGroupDataChanged(adapter);
-            }
-        });
-    }
-
-    private List<Task> queryUserTasks() {
-        return null;
-        //TODO
-    }
-
-
-    public void mockUsers() {
-        for (int k = 0; k < 5; k++) {
-            List<Task> tasks = new ArrayList<>();
-            for (int i = 0; i < 3; i++) {
-                tasks.add(new Task.Builder("000", "Task" + k, "fake@mail.com", null).isComplete().build());
-            }
-            User user = new User("MockUser" + k,
-                    "user" + k + "@gmail.com",
-                    "Developer", String.valueOf(k), tasks);
-            User.GroupItem userGroupItem = new User.GroupItem(user);
-            items.add(userGroupItem);
-        }
-    }
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         adapter.onSaveInstanceState(outState);
     }
 
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {    //in loc de onRestoreInstanceState
         super.onActivityCreated(savedInstanceState);
         adapter.onRestoreInstanceState(savedInstanceState);
     }
-
 
     @Override
     public void onDestroyView() {
@@ -253,7 +292,6 @@ public class UserTaskListFragment extends Fragment {
 
     }
 
-
     private void getAccountDetails(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
         if (googleSignInAccount != null) {
@@ -261,8 +299,14 @@ public class UserTaskListFragment extends Fragment {
         }
     }
 
+
     @FunctionalInterface
-    public interface AddTaskListener {
+    public interface OnReadTasksCallback {
+        void onReadTasks(List<Task> tasks);
+    }
+
+    @FunctionalInterface
+    public interface OnAddTaskCallback {
         void onAddTask(User user);
     }
 

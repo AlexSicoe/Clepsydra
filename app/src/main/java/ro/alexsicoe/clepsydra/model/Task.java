@@ -4,11 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import ro.alexsicoe.clepsydra.util.DateUtil;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+
+import ro.alexsicoe.clepsydra.util.DateUtil;
 
 public class Task implements Parcelable {
     public static final Creator<Task> CREATOR = new Creator<Task>() {
@@ -116,6 +117,33 @@ public class Task implements Parcelable {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Task task = (Task) o;
+
+        return id.equals(task.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", ownerEmail='" + ownerEmail + '\'' +
+                ", complete=" + complete +
+                ", interval=" + interval +
+                ", subTasks=" + subTasks +
+                '}';
+    }
+
     public static class Builder {
         private Task task;
 
@@ -143,13 +171,15 @@ public class Task implements Parcelable {
     }
 
     public static class Interval {
+        @NonNull
         private Date start;
+        @NonNull
         private Date finish;
 
         public Interval() {
         }
 
-        public Interval(Date start, Date finish) {
+        public Interval(@NonNull Date start, @NonNull Date finish) {
             this.start = start;
             this.finish = finish;
         }
@@ -158,7 +188,7 @@ public class Task implements Parcelable {
             return start;
         }
 
-        public void setStart(Date start) {
+        public void setStart(@NonNull Date start) {
             this.start = start;
         }
 
@@ -166,7 +196,7 @@ public class Task implements Parcelable {
             return finish;
         }
 
-        public void setFinish(Date finish) {
+        public void setFinish(@NonNull Date finish) {
             this.finish = finish;
         }
 
