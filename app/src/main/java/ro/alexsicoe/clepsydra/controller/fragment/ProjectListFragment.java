@@ -112,34 +112,30 @@ public class ProjectListFragment extends Fragment {
     private void readUserProjects() {
         userProjectsRef
                 .whereEqualTo("email", userEmail)
-                .addSnapshotListener((snapshots, e) -> {
-                    if (e != null) {
-                        LogUtil.except(TAG, e);
-                        return;
-                    }
-                    readUserProjectsSuccess(snapshots);
-                });
+                .addSnapshotListener(this::readUserProjectsSuccess);
     }
 
 
-    private void readUserProjectsSuccess(QuerySnapshot snapshots) {
+    private void readUserProjectsSuccess(QuerySnapshot snapshots, Exception e) {
+        if (e != null) {
+            LogUtil.except(TAG, e);
+            return;
+        }
         if (snapshots == null)
             return;
         for (QueryDocumentSnapshot doc : snapshots) {
             String projectId = doc.getString("projectId");
             projectsRef
                     .whereEqualTo("id", projectId)
-                    .addSnapshotListener((snapshots1, e) -> {
-                        if (e != null) {
-                            LogUtil.except(TAG, e);
-                            return;
-                        }
-                        readProjectsSuccess(snapshots1);
-                    });
+                    .addSnapshotListener(this::readProjectsSuccess);
         }
     }
 
-    private void readProjectsSuccess(QuerySnapshot snapshots) {
+    private void readProjectsSuccess(QuerySnapshot snapshots, Exception e) {
+        if (e != null) {
+            LogUtil.except(TAG, e);
+            return;
+        }
         if (snapshots == null)
             return;
         for (DocumentChange dc : snapshots.getDocumentChanges()) {
