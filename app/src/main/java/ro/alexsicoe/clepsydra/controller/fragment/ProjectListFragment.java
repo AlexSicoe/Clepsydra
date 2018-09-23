@@ -25,13 +25,11 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -47,6 +45,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Project;
+import ro.alexsicoe.clepsydra.util.LogUtil;
 import ro.alexsicoe.clepsydra.view.recyclerView.adapter.ProjectRecyclerViewAdapter;
 
 public class ProjectListFragment extends Fragment {
@@ -112,63 +111,52 @@ public class ProjectListFragment extends Fragment {
     }
 
     private void readUserProjects() {
-
-        userProjectsRef
-                .whereEqualTo("email", userEmail)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "Listen failed.", e);
-                            return;
-                        }
-                        assert snapshots != null;
-                        for (QueryDocumentSnapshot doc : snapshots) {
-                            if (doc.get("projectId") != null) {
-                                String projectId = doc.getString("projectId");
-
-                                final Query query = projectsRef
-                                        .whereEqualTo("id", projectId);
-                                query.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                                        if (e != null) {
-                                            Log.w(TAG, "listen:error", e);
-                                            return;
-                                        }
-                                        if (snapshots != null) {
-                                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                                                Project project = dc.getDocument().toObject(Project.class);
-                                                int index = projects.indexOf(project);
-                                                switch (dc.getType()) {
-                                                    case ADDED:
-                                                        if (!projects.contains(project)) {
-                                                            projects.add(project);
-                                                        }
-                                                        break;
-                                                    case MODIFIED:
-                                                        projects.set(index, project);
-                                                        break;
-                                                    case REMOVED:
-                                                        projects.remove(project);
-                                                        break;
-                                                }
-                                            }
-                                            projects.sort(new Comparator<Project>() {
-                                                @Override
-                                                public int compare(Project o1, Project o2) {
-                                                    return o1.getName().compareTo(o2.getName());
-                                                }
-                                            });
-                                            adapter.notifyDataSetChanged();
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
+        Task<QuerySnapshot> task =
+                userProjectsRef
+                        .whereEqualTo("email", userEmail)
+                        .get()
+                        .addOnSuccessListener(this::readUserProjectsSuccess)
+                        .addOnFailureListener(e -> LogUtil.except(TAG, e));
     }
+
+
+    private void readUserProjectsSuccess(QuerySnapshot snapshots) {
+        if (snapshots == null)
+            return;
+        for (QueryDocumentSnapshot doc : snapshots) {
+            String projectId = doc.getString("projectId");
+            Task<QuerySnapshot> task = projectsRef
+                    .whereEqualTo("id", projectId)
+                    .get()
+                    .addOnSuccessListener(this::readProjectsSuccess)
+                    .addOnFailureListener(e -> LogUtil.except(TAG, e));
+        }
+    }
+
+    private void readProjectsSuccess(QuerySnapshot snapshots) {
+        if (snapshots == null)
+            return;
+        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+            Project project = dc.getDocument().toObject(Project.class);
+            int index = projects.indexOf(project);
+            switch (dc.getType()) {
+                case ADDED:
+                    if (!projects.contains(project)) {
+                        projects.add(project);
+                    }
+                    break;
+                case MODIFIED:
+                    projects.set(index, project);
+                    break;
+                case REMOVED:
+                    projects.remove(project);
+                    break;
+            }
+        }
+        projects.sort(Comparator.comparing(Project::getName));
+        adapter.notifyDataSetChanged();
+    }
+
 
 
     private void getAccountDetails(Context context) {

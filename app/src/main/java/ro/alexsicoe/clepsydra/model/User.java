@@ -16,15 +16,15 @@ public class User {
     private String position;
     @NonNull
     private String tokenId;
-    private List<Task> tasks;
+    private List<Taskk> taskks;
 
 
-    public User(@Nullable String name, @NonNull String email, @Nullable String position, @NonNull String tokenId, List<Task> tasks) {
+    public User(@Nullable String name, @NonNull String email, @Nullable String position, @NonNull String tokenId, List<Taskk> taskks) {
         this.name = name;
         this.email = email;
         this.position = position;
         this.tokenId = tokenId;
-        this.tasks = tasks;
+        this.taskks = taskks;
     }
 
 
@@ -67,12 +67,12 @@ public class User {
         this.tokenId = tokenId;
     }
 
-    public List<Task> getTasks() {
-        return tasks;
+    public List<Taskk> getTaskks() {
+        return taskks;
     }
 
-    public User setTasks(List<Task> tasks) {
-        this.tasks = tasks;
+    public User setTaskks(List<Taskk> taskks) {
+        this.taskks = taskks;
         return this;
     }
 
@@ -83,7 +83,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", position='" + position + '\'' +
                 ", tokenId='" + tokenId + '\'' +
-                ", tasks=" + tasks +
+                ", taskks=" + taskks +
                 '}';
     }
 
@@ -103,11 +103,11 @@ public class User {
         return email.hashCode();
     }
 
-    public static class GroupItem extends ExpandableGroup<Task> {
+    public static class GroupItem extends ExpandableGroup<Taskk> {
         private User user;
 
         public GroupItem(User user) {
-            super(user.getName(), user.getTasks());
+            super(user.getName(), user.getTaskks());
             this.user = user;
         }
 

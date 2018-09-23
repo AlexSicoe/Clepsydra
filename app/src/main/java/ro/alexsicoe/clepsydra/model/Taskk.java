@@ -11,16 +11,16 @@ import java.util.List;
 
 import ro.alexsicoe.clepsydra.util.DateUtil;
 
-public class Task implements Parcelable {
-    public static final Creator<Task> CREATOR = new Creator<Task>() {
+public class Taskk implements Parcelable {
+    public static final Creator<Taskk> CREATOR = new Creator<Taskk>() {
         @Override
-        public Task createFromParcel(Parcel in) {
-            return new Task(in);
+        public Taskk createFromParcel(Parcel in) {
+            return new Taskk(in);
         }
 
         @Override
-        public Task[] newArray(int size) {
-            return new Task[size];
+        public Taskk[] newArray(int size) {
+            return new Taskk[size];
         }
     };
     @NonNull
@@ -33,18 +33,18 @@ public class Task implements Parcelable {
     @NonNull
     private Interval interval;
     @Nullable
-    private List<Task> subTasks;
+    private List<Taskk> subTaskks;
 
 
-    public Task() {
+    public Taskk() {
     }
 
-    protected Task(Parcel in) {
+    protected Taskk(Parcel in) {
         id = in.readString();
         name = in.readString();
         ownerEmail = in.readString();
         complete = in.readByte() != 0;
-        subTasks = in.createTypedArrayList(Task.CREATOR);
+        subTaskks = in.createTypedArrayList(Taskk.CREATOR);
     }
 
     @NonNull
@@ -52,7 +52,7 @@ public class Task implements Parcelable {
         return id;
     }
 
-    public Task setId(@NonNull String id) {
+    public Taskk setId(@NonNull String id) {
         this.id = id;
         return this;
     }
@@ -71,7 +71,7 @@ public class Task implements Parcelable {
         return ownerEmail;
     }
 
-    public Task setOwnerEmail(@NonNull String ownerEmail) {
+    public Taskk setOwnerEmail(@NonNull String ownerEmail) {
         this.ownerEmail = ownerEmail;
         return this;
     }
@@ -94,12 +94,12 @@ public class Task implements Parcelable {
     }
 
     @Nullable
-    public List<Task> getSubTasks() {
-        return subTasks;
+    public List<Taskk> getSubTaskks() {
+        return subTaskks;
     }
 
-    public void setSubTasks(@Nullable List<Task> subTasks) {
-        this.subTasks = subTasks;
+    public void setSubTaskks(@Nullable List<Taskk> subTaskks) {
+        this.subTaskks = subTaskks;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class Task implements Parcelable {
         dest.writeString(name);
         dest.writeString(ownerEmail);
         dest.writeByte((byte) (complete ? 1 : 0));
-        dest.writeTypedList(subTasks);
+        dest.writeTypedList(subTaskks);
     }
 
 
@@ -122,9 +122,9 @@ public class Task implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Task task = (Task) o;
+        Taskk taskk = (Taskk) o;
 
-        return id.equals(task.id);
+        return id.equals(taskk.id);
     }
 
     @Override
@@ -134,39 +134,39 @@ public class Task implements Parcelable {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "Taskk{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", ownerEmail='" + ownerEmail + '\'' +
                 ", complete=" + complete +
                 ", interval=" + interval +
-                ", subTasks=" + subTasks +
+                ", subTaskks=" + subTaskks +
                 '}';
     }
 
     public static class Builder {
-        private Task task;
+        private Taskk taskk;
 
         public Builder(@NonNull String id, @NonNull String name, @NonNull String ownerEmail, @NonNull Interval interval) {
-            this.task = new Task();
-            this.task.id = id;
-            this.task.name = name;
-            this.task.interval = interval;
-            this.task.ownerEmail = ownerEmail;
+            this.taskk = new Taskk();
+            this.taskk.id = id;
+            this.taskk.name = name;
+            this.taskk.interval = interval;
+            this.taskk.ownerEmail = ownerEmail;
         }
 
         public Builder isComplete() {
-            this.task.complete = true;
+            this.taskk.complete = true;
             return this;
         }
 
-        public Builder setSubTasks(List<Task> subTasks) {
-            this.task.subTasks = subTasks;
+        public Builder setSubTasks(List<Taskk> subTaskks) {
+            this.taskk.subTaskks = subTaskks;
             return this;
         }
 
-        public Task build() {
-            return this.task;
+        public Taskk build() {
+            return this.taskk;
         }
     }
 

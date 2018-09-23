@@ -38,7 +38,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.model.Task;
+import ro.alexsicoe.clepsydra.model.Taskk;
 import ro.alexsicoe.clepsydra.model.User;
 import ro.alexsicoe.clepsydra.util.DateTimeObserver;
 import ro.alexsicoe.clepsydra.util.DateUtil;
@@ -99,14 +99,14 @@ public class UserTaskListFragment extends Fragment {
 
     public void readMockUsers() {
         for (int k = 0; k < 5; k++) {
-            List<Task> tasks = new ArrayList<>();
+            List<Taskk> taskks = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
-                Task.Interval interval = new Task.Interval(new Date(), new Date());
-                tasks.add(new Task.Builder("000", "Task" + k, "fake@mail.com", interval).isComplete().build());
+                Taskk.Interval interval = new Taskk.Interval(new Date(), new Date());
+                taskks.add(new Taskk.Builder("000", "Taskk" + k, "fake@mail.com", interval).isComplete().build());
             }
             User user = new User("MockUser" + k,
                     "user" + k + "@gmail.com",
-                    "Developer", String.valueOf(k), tasks);
+                    "Developer", String.valueOf(k), taskks);
             User.GroupItem userGroupItem = new User.GroupItem(user);
             items.add(userGroupItem);
         }
@@ -148,7 +148,7 @@ public class UserTaskListFragment extends Fragment {
                 for (DocumentChange dc : snapshots.getDocumentChanges()) {
                     User user = dc.getDocument().toObject(User.class);
                     queryUserTasks(user, tasks -> {
-                        user.setTasks(tasks);
+                        user.setTaskks(tasks);
                         User.GroupItem item = new User.GroupItem(user);
                         int index = items.indexOf(item);
 
@@ -181,7 +181,7 @@ public class UserTaskListFragment extends Fragment {
     }
 
     private void queryUserTasks(User user, OnReadTasksCallback callback) {
-        List<Task> tasks = new ArrayList<>();
+        List<Taskk> taskks = new ArrayList<>();
         tasksRef.whereEqualTo("ownerEmail", user.getEmail())
                 .orderBy("name", Query.Direction.ASCENDING)
                 .addSnapshotListener((snapshots, e) -> {
@@ -191,26 +191,26 @@ public class UserTaskListFragment extends Fragment {
                     }
 
                     for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                        Task task = dc.getDocument().toObject(Task.class);
-                        int index = items.indexOf(task);
+                        Taskk taskk = dc.getDocument().toObject(Taskk.class);
+                        int index = items.indexOf(taskk);
 
                         switch (dc.getType()) {
                             case ADDED:
-                                Log.d(TAG, "ADDED: " + task.toString());
-                                tasks.add(task);
+                                Log.d(TAG, "ADDED: " + taskk.toString());
+                                taskks.add(taskk);
                                 break;
                             case MODIFIED:
-                                Log.d(TAG, "MODIFIED: " + task.toString());
-                                tasks.set(index, task);
+                                Log.d(TAG, "MODIFIED: " + taskk.toString());
+                                taskks.set(index, taskk);
                                 break;
                             case REMOVED:
-                                Log.d(TAG, "REMOVED: " + task.toString());
-                                tasks.remove(task);
+                                Log.d(TAG, "REMOVED: " + taskk.toString());
+                                taskks.remove(taskk);
                                 break;
                         }
                     }
                     ExpandableListUtils.notifyGroupDataChanged(adapter); // TODO ?
-                    callback.onReadTasks(tasks);
+                    callback.onReadTasks(taskks);
                 });
     }
 
@@ -254,11 +254,11 @@ public class UserTaskListFragment extends Fragment {
             }
 
             final String id = tasksRef.document().getId();
-            Task.Interval interval = new Task.Interval(startDate, finishDate);
-            Task task = new Task.Builder(id, taskName, user.getEmail(), interval).build();
+            Taskk.Interval interval = new Taskk.Interval(startDate, finishDate);
+            Taskk taskk = new Taskk.Builder(id, taskName, user.getEmail(), interval).build();
 
-            tasksRef.document(id).set(task).addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Task added");
+            tasksRef.document(id).set(taskk).addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Taskk added");
                 Toast.makeText(UserTaskListFragment.this.getContext(), R.string.success, Toast.LENGTH_SHORT).show();
             }).addOnFailureListener(e -> Log.w(TAG, e.toString()));
 
@@ -302,7 +302,7 @@ public class UserTaskListFragment extends Fragment {
 
     @FunctionalInterface
     public interface OnReadTasksCallback {
-        void onReadTasks(List<Task> tasks);
+        void onReadTasks(List<Taskk> taskks);
     }
 
     @FunctionalInterface

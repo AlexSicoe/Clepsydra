@@ -13,7 +13,7 @@ import java.util.List;
 
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.controller.fragment.UserTaskListFragment;
-import ro.alexsicoe.clepsydra.model.Task;
+import ro.alexsicoe.clepsydra.model.Taskk;
 import ro.alexsicoe.clepsydra.model.User;
 import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.TaskViewHolder;
 import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.UserViewHolder;
@@ -47,8 +47,8 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
 
     @Override
     public void onBindChildViewHolder(TaskViewHolder holder, int flatPosition, ExpandableGroup group, int childIndex) {
-        final Task task = ((User.GroupItem) group).getItems().get(childIndex);
-        holder.onBind(task);
+        final Taskk taskk = ((User.GroupItem) group).getItems().get(childIndex);
+        holder.onBind(taskk);
     }
 
     @Override
