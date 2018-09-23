@@ -121,7 +121,7 @@ public class ProjectListFragment extends Fragment {
             return;
         }
         if (snapshots == null) {
-            tvEmpty.setVisibility(View.VISIBLE);
+//            tvEmpty.setVisibility(View.VISIBLE);
             return;
         }
         for (QueryDocumentSnapshot doc : snapshots) {

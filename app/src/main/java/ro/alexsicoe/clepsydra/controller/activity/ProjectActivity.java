@@ -31,7 +31,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.controller.fragment.UserTaskListFragment;
+import ro.alexsicoe.clepsydra.controller.fragment.KanbanFragment;
 import ro.alexsicoe.clepsydra.model.Project;
 
 public class ProjectActivity extends AppCompatActivity {
@@ -71,7 +71,8 @@ public class ProjectActivity extends AppCompatActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.root_layout, UserTaskListFragment.newInstance(projectId), "userTaskListFragment")
+//                .add(R.id.root_layout, UserTaskListFragment.newInstance(projectId), "userTaskListFragment")
+                .add(R.id.root_layout, KanbanFragment.newInstance(projectId), "KanbanFragment")
                 .commit();
 
         View headerView = navView.getHeaderView(0);
@@ -116,7 +117,7 @@ public class ProjectActivity extends AppCompatActivity {
                     Toast.makeText(ProjectActivity.this, "TODO", Toast.LENGTH_SHORT).show();
                 }
 
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                DrawerLayout drawer = findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
@@ -188,4 +189,5 @@ public class ProjectActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
