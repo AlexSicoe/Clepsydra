@@ -37,6 +37,7 @@ public class Task implements Parcelable {
 
 
     public Task() {
+
     }
 
     protected Task(Parcel in) {
