@@ -8,7 +8,7 @@ import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.model.Taskk;
+import ro.alexsicoe.clepsydra.model.Task;
 
 public class TaskViewHolder extends ChildViewHolder {
     @BindView(R.id.tvTaskName)
@@ -19,8 +19,8 @@ public class TaskViewHolder extends ChildViewHolder {
         ButterKnife.bind(this, view);
     }
 
-    public void onBind(Taskk taskk) {
-        tvTaskName.setText(taskk.getName());
+    public void onBind(Task task) {
+        tvTaskName.setText(task.getName());
     }
 
 
