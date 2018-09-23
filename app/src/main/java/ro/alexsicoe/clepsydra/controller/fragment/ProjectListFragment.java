@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -111,12 +110,15 @@ public class ProjectListFragment extends Fragment {
     }
 
     private void readUserProjects() {
-        Task<QuerySnapshot> task =
-                userProjectsRef
-                        .whereEqualTo("email", userEmail)
-                        .get()
-                        .addOnSuccessListener(this::readUserProjectsSuccess)
-                        .addOnFailureListener(e -> LogUtil.except(TAG, e));
+        userProjectsRef
+                .whereEqualTo("email", userEmail)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        LogUtil.except(TAG, e);
+                        return;
+                    }
+                    readUserProjectsSuccess(snapshots);
+                });
     }
 
 
@@ -125,11 +127,15 @@ public class ProjectListFragment extends Fragment {
             return;
         for (QueryDocumentSnapshot doc : snapshots) {
             String projectId = doc.getString("projectId");
-            Task<QuerySnapshot> task = projectsRef
+            projectsRef
                     .whereEqualTo("id", projectId)
-                    .get()
-                    .addOnSuccessListener(this::readProjectsSuccess)
-                    .addOnFailureListener(e -> LogUtil.except(TAG, e));
+                    .addSnapshotListener((snapshots1, e) -> {
+                        if (e != null) {
+                            LogUtil.except(TAG, e);
+                            return;
+                        }
+                        readProjectsSuccess(snapshots1);
+                    });
         }
     }
 
@@ -156,7 +162,6 @@ public class ProjectListFragment extends Fragment {
         projects.sort(Comparator.comparing(Project::getName));
         adapter.notifyDataSetChanged();
     }
-
 
 
     private void getAccountDetails(Context context) {
