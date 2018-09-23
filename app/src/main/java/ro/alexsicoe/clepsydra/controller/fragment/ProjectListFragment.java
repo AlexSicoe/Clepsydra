@@ -105,33 +105,34 @@ public class ProjectListFragment extends Fragment {
         setupTouchHelper();
         readUserProjects();
 
-
         return view;
     }
 
     private void readUserProjects() {
         userProjectsRef
                 .whereEqualTo("email", userEmail)
-                .addSnapshotListener(this::readUserProjectsSuccess);
+                .addSnapshotListener(this::readUserProjectsAsync);
     }
 
 
-    private void readUserProjectsSuccess(QuerySnapshot snapshots, Exception e) {
+    private void readUserProjectsAsync(QuerySnapshot snapshots, Exception e) {
         if (e != null) {
             LogUtil.except(TAG, e);
             return;
         }
-        if (snapshots == null)
+        if (snapshots == null) {
+            tvEmpty.setVisibility(View.VISIBLE);
             return;
+        }
         for (QueryDocumentSnapshot doc : snapshots) {
             String projectId = doc.getString("projectId");
             projectsRef
                     .whereEqualTo("id", projectId)
-                    .addSnapshotListener(this::readProjectsSuccess);
+                    .addSnapshotListener(this::readProjectsAsync);
         }
     }
 
-    private void readProjectsSuccess(QuerySnapshot snapshots, Exception e) {
+    private void readProjectsAsync(QuerySnapshot snapshots, Exception e) {
         if (e != null) {
             LogUtil.except(TAG, e);
             return;
