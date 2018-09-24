@@ -102,6 +102,7 @@ public class ProjectListFragment extends Fragment {
 
         projects = new ArrayList<>();
         adapter = new ProjectRecyclerViewAdapter(getContext(), projects);
+
         recyclerView.setAdapter(adapter);
         setupTouchHelper();
         readUserProjects();

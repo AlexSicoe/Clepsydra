@@ -79,9 +79,11 @@ public class ProjectRecyclerViewAdapter extends RecyclerView.Adapter<ProjectRecy
             final DocumentReference docRef = db.
                     collection("Projects").document(id);
 
+
             tvProjectName.setText(name);
             tvCreatedBy.setText(createdBy);
             DateFormat df = new DateUtil(context).getDateFormat(DateFormat.MEDIUM);
+
             tvCreatedAt.setText(df.format(createdAt));
 
 

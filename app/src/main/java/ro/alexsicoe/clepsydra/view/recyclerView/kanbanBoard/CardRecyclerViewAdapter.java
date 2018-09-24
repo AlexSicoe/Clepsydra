@@ -22,6 +22,7 @@ import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
 
 public class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecyclerViewAdapter.ViewHolder> {
+    public static final String TAG = CardRecyclerViewAdapter.class.getSimpleName();
     TextView tvHeader;
     ArrayList<View> extraViews;
     private Context context;

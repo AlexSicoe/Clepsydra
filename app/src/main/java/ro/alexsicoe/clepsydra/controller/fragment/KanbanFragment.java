@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -46,7 +45,6 @@ public class KanbanFragment extends Fragment {
         if (getArguments() != null) {
             projectId = getArguments().getString(ARG_PROJECT_ID);
         }
-        Toast.makeText(getContext(), projectId, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -74,6 +72,7 @@ public class KanbanFragment extends Fragment {
             Task task = new Task("000", "Task1", phase);
             tasks.addLast(task);
         }
+        adapter.notifyDataSetChanged();
     }
 
 }
