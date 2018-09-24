@@ -21,7 +21,7 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
     private OnAddTaskCallback onAddTaskCallback;
 
 
-    public UserAdapter(List<? extends ExpandableGroup> groups, Context context, UserTaskListFragment.OnAddTaskCallback onAddTaskCallback) {
+    public UserAdapter(List<? extends ExpandableGroup> groups, Context context, OnAddTaskCallback onAddTaskCallback) {
         super(groups);
         this.context = context;
         this.onAddTaskCallback = onAddTaskCallback;
@@ -54,7 +54,8 @@ public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, T
     }
 
     public void addAll(List<User.GroupItem> groupItems) {
-        ((List<User.GroupItem>) getGroups()).addAll(groupItems);
+        List<User.GroupItem> groups = (List<User.GroupItem>) getGroups();
+        (groups).addAll(groupItems);
         ExpandableListUtils.notifyGroupDataChanged(this);
         notifyDataSetChanged();
     }

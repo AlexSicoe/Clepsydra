@@ -14,52 +14,18 @@ public class Project implements Serializable {
     @NonNull
     private String createdBy;
     @NonNull
-    private Date start;
+    private Date createdAt;
     //private List<Milestone> milestones;
     //private List<User> users;
 
     public Project() {
     }
 
-    public Project(@NonNull String id, @NonNull String name, @NonNull String createdBy, @NonNull Date start) {
-        this.id = id;
-        this.name = name;
-        this.createdBy = createdBy;
-        this.start = start;
-    }
-
     public Project(@NonNull String id, @NonNull String name, @NonNull String createdBy) {
         this.id = id;
         this.name = name;
         this.createdBy = createdBy;
-        this.start = new Date();
-    }
-
-    @NonNull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(@NonNull String name) {
-        this.name = name;
-    }
-
-    @NonNull
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(@NonNull String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    @NonNull
-    public Date getStart() {
-        return start;
-    }
-
-    public void setStart(@NonNull Date start) {
-        this.start = start;
+        this.createdAt = new Date();
     }
 
     @NonNull
@@ -72,13 +38,43 @@ public class Project implements Serializable {
         return this;
     }
 
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    public Project setName(@NonNull String name) {
+        this.name = name;
+        return this;
+    }
+
+    @NonNull
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public Project setCreatedBy(@NonNull String createdBy) {
+        this.createdBy = createdBy;
+        return this;
+    }
+
+    @NonNull
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Project setCreatedAt(@NonNull Date createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "Project{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", createdBy='" + createdBy + '\'' +
-                ", start=" + start +
+                ", createdAt=" + createdAt +
                 '}';
     }
 

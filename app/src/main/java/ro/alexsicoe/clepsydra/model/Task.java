@@ -9,6 +9,12 @@ import java.util.Date;
 import java.util.List;
 
 public class Task implements Parcelable {
+
+
+    @NonNull
+    private String id;
+    @NonNull
+    private String name;
     public static final Creator<Task> CREATOR = new Creator<Task>() {
         @Override
         public Task createFromParcel(Parcel in) {
@@ -20,12 +26,6 @@ public class Task implements Parcelable {
             return new Task[size];
         }
     };
-    @NonNull
-    private String id;
-    @NonNull
-    private String name;
-    @NonNull
-    private State state;
     @NonNull
     private Date createdAt;
     @Nullable
@@ -40,15 +40,22 @@ public class Task implements Parcelable {
 
     }
 
-    public Task(@NonNull String id, @NonNull String name, @NonNull State state) {
+    @NonNull
+    private Phase phase;
+
+
+    public Task(@NonNull String id, @NonNull String name, @NonNull Phase phase) {
         this.id = id;
         this.name = name;
-        this.state = state;
+        this.phase = phase;
         this.createdAt = new Date();
     }
 
-    public static Creator<Task> getCREATOR() {
-        return CREATOR;
+    protected Task(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        description = in.readString();
+        assignedOwners = in.createStringArrayList();
     }
 
     @Nullable
@@ -62,12 +69,12 @@ public class Task implements Parcelable {
     }
 
     @NonNull
-    public State getState() {
-        return state;
+    public Phase getPhase() {
+        return phase;
     }
 
-    public Task setState(@NonNull State state) {
-        this.state = state;
+    public Task setPhase(@NonNull Phase phase) {
+        this.phase = phase;
         return this;
     }
 
@@ -143,8 +150,12 @@ public class Task implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeStringList(assignedOwners);
     }
+
 
     public class TodoItem {
         private String description;
@@ -175,16 +186,16 @@ public class Task implements Parcelable {
     }
 
 
-    public class State {
+    public class Phase {
         String name;
 
         //TODO count progress bar
 
-        public State() {
+        public Phase() {
 
         }
 
-        public State(String name) {
+        public Phase(String name) {
             this.name = name;
         }
 
@@ -192,7 +203,7 @@ public class Task implements Parcelable {
             return name;
         }
 
-        public State setName(String name) {
+        public Phase setName(String name) {
             this.name = name;
             return this;
         }

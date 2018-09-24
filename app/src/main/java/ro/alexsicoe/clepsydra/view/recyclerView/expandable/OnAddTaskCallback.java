@@ -1,6 +1,7 @@
 package ro.alexsicoe.clepsydra.view.recyclerView.expandable;
 
-import com.firebase.ui.auth.data.model.User;
+
+import ro.alexsicoe.clepsydra.model.User;
 
 @FunctionalInterface
 public interface OnAddTaskCallback {

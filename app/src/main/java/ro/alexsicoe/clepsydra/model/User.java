@@ -36,8 +36,9 @@ public class User {
         return name;
     }
 
-    public void setName(@Nullable String name) {
+    public User setName(@Nullable String name) {
         this.name = name;
+        return this;
     }
 
     @NonNull
@@ -45,8 +46,9 @@ public class User {
         return email;
     }
 
-    public void setEmail(@NonNull String email) {
+    public User setEmail(@NonNull String email) {
         this.email = email;
+        return this;
     }
 
     @Nullable
@@ -54,8 +56,9 @@ public class User {
         return position;
     }
 
-    public void setPosition(@Nullable String position) {
+    public User setPosition(@Nullable String position) {
         this.position = position;
+        return this;
     }
 
     @NonNull
@@ -63,8 +66,9 @@ public class User {
         return tokenId;
     }
 
-    public void setTokenId(@NonNull String tokenId) {
+    public User setTokenId(@NonNull String tokenId) {
         this.tokenId = tokenId;
+        return this;
     }
 
     public List<Task> getTasks() {

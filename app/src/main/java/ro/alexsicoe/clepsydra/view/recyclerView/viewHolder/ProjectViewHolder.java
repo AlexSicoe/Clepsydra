@@ -44,9 +44,9 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
         tvProjectName.setText(name);
         String createdBy = context.getString(R.string.created_by) + model.getCreatedBy();
         tvCreatedBy.setText(createdBy);
-        Date startDate = model.getStart();
+        Date createdAt = model.getCreatedAt();
         DateFormat df = new DateUtil(context).getDateFormat(DateFormat.MEDIUM);
-        tvStartDate.setText(df.format(startDate));
+        tvStartDate.setText(df.format(createdAt));
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final DocumentReference docRef = db.
                 collection("Projects").document(id);
@@ -72,7 +72,7 @@ public class ProjectViewHolder extends RecyclerView.ViewHolder {
 
             builder.setPositiveButton(R.string.update, (dialog, which) -> {
                 String newProjectName = et.getText().toString().trim();
-                Map<String, String> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("name", newProjectName);
                 docRef.update(map);
             }).setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
