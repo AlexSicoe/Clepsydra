@@ -71,7 +71,6 @@ public class ProjectActivity extends AppCompatActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-//                .add(R.id.root_layout, UserTaskListFragment.newInstance(projectId), "userTaskListFragment")
                 .add(R.id.root_layout, KanbanFragment.newInstance(projectId), "KanbanFragment")
                 .commit();
 

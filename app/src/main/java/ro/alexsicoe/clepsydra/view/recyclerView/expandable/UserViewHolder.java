@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.view.recyclerView.viewHolder;
+package ro.alexsicoe.clepsydra.view.recyclerView.expandable;
 
 import android.view.View;
 import android.widget.TextView;
@@ -10,11 +10,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.controller.fragment.UserTaskListFragment;
 import ro.alexsicoe.clepsydra.model.User;
 
 public class UserViewHolder extends GroupViewHolder {
-    private static final String TAG = UserTaskListFragment.class.getSimpleName();
     @BindView(R.id.tvUserName)
     TextView tvName;
     @BindView(R.id.tvEmail)
@@ -23,9 +21,9 @@ public class UserViewHolder extends GroupViewHolder {
     private FirebaseFirestore db;
     private User user;
 
-    private UserTaskListFragment.OnAddTaskCallback callback;
+    private OnAddTaskCallback callback;
 
-    public UserViewHolder(View view, UserTaskListFragment.OnAddTaskCallback callback) {
+    public UserViewHolder(View view, OnAddTaskCallback callback) {
         super(view);
         ButterKnife.bind(this, view);
 

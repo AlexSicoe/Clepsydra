@@ -5,11 +5,8 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-
-import ro.alexsicoe.clepsydra.util.DateUtil;
 
 public class Task implements Parcelable {
     public static final Creator<Task> CREATOR = new Creator<Task>() {
@@ -28,24 +25,50 @@ public class Task implements Parcelable {
     @NonNull
     private String name;
     @NonNull
-    private String ownerEmail;
-    private boolean complete;
+    private State state;
     @NonNull
-    private Interval interval;
+    private Date createdAt;
     @Nullable
-    private List<Task> subTasks;
+    private String description;
+    @Nullable
+    private List<String> assignedOwners; //emails
+    @Nullable
+    private List<TodoItem> todoItems;
 
 
     public Task() {
 
     }
 
-    protected Task(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        ownerEmail = in.readString();
-        complete = in.readByte() != 0;
-        subTasks = in.createTypedArrayList(Task.CREATOR);
+    public Task(@NonNull String id, @NonNull String name, @NonNull State state) {
+        this.id = id;
+        this.name = name;
+        this.state = state;
+        this.createdAt = new Date();
+    }
+
+    public static Creator<Task> getCREATOR() {
+        return CREATOR;
+    }
+
+    @Nullable
+    public List<String> getAssignedOwners() {
+        return assignedOwners;
+    }
+
+    public Task setAssignedOwners(@Nullable List<String> assignedOwners) {
+        this.assignedOwners = assignedOwners;
+        return this;
+    }
+
+    @NonNull
+    public State getState() {
+        return state;
+    }
+
+    public Task setState(@NonNull State state) {
+        this.state = state;
+        return this;
     }
 
     @NonNull
@@ -63,60 +86,40 @@ public class Task implements Parcelable {
         return name;
     }
 
-    public void setName(@NonNull String name) {
+    public Task setName(@NonNull String name) {
         this.name = name;
-    }
-
-    @NonNull
-    public String getOwnerEmail() {
-        return ownerEmail;
-    }
-
-    public Task setOwnerEmail(@NonNull String ownerEmail) {
-        this.ownerEmail = ownerEmail;
         return this;
     }
 
-    public boolean isComplete() {
-        return complete;
+    @Nullable
+    public String getDescription() {
+        return description;
     }
 
-    public void setComplete(boolean complete) {
-        this.complete = complete;
-    }
-
-    @NonNull
-    public Interval getInterval() {
-        return interval;
-    }
-
-    public void setInterval(@NonNull Interval interval) {
-        this.interval = interval;
+    public Task setDescription(@Nullable String description) {
+        this.description = description;
+        return this;
     }
 
     @Nullable
-    public List<Task> getSubTasks() {
-        return subTasks;
+    public List<TodoItem> getTodoItems() {
+        return todoItems;
     }
 
-    public void setSubTasks(@Nullable List<Task> subTasks) {
-        this.subTasks = subTasks;
+    public Task setTodoItems(@Nullable List<TodoItem> todoItems) {
+        this.todoItems = todoItems;
+        return this;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    @NonNull
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(ownerEmail);
-        dest.writeByte((byte) (complete ? 1 : 0));
-        dest.writeTypedList(subTasks);
+    public Task setCreatedAt(@NonNull Date createdAt) {
+        this.createdAt = createdAt;
+        return this;
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -134,81 +137,64 @@ public class Task implements Parcelable {
     }
 
     @Override
-    public String toString() {
-        return "Task{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", ownerEmail='" + ownerEmail + '\'' +
-                ", complete=" + complete +
-                ", interval=" + interval +
-                ", subTasks=" + subTasks +
-                '}';
+    public int describeContents() {
+        return 0;
     }
 
-    public static class Builder {
-        private Task task;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
 
-        public Builder(@NonNull String id, @NonNull String name, @NonNull String ownerEmail, @NonNull Interval interval) {
-            this.task = new Task();
-            this.task.id = id;
-            this.task.name = name;
-            this.task.interval = interval;
-            this.task.ownerEmail = ownerEmail;
+    }
+
+    public class TodoItem {
+        private String description;
+        private boolean isComplete;
+
+        public TodoItem(String description, boolean isComplete) {
+            this.description = description;
+            this.isComplete = isComplete;
         }
 
-        public Builder isComplete() {
-            this.task.complete = true;
+        public String getDescription() {
+            return description;
+        }
+
+        public TodoItem setDescription(String description) {
+            this.description = description;
             return this;
         }
 
-        public Builder setSubTasks(List<Task> subTasks) {
-            this.task.subTasks = subTasks;
-            return this;
+        public boolean isComplete() {
+            return isComplete;
         }
 
-        public Task build() {
-            return this.task;
+        public TodoItem setComplete(boolean complete) {
+            isComplete = complete;
+            return this;
         }
     }
 
-    public static class Interval {
-        @NonNull
-        private Date start;
-        @NonNull
-        private Date finish;
 
-        public Interval() {
+    public class State {
+        String name;
+
+        //TODO count progress bar
+
+        public State() {
+
         }
 
-        public Interval(@NonNull Date start, @NonNull Date finish) {
-            this.start = start;
-            this.finish = finish;
+        public State(String name) {
+            this.name = name;
         }
 
-        public Date getStart() {
-            return start;
+        public String getName() {
+            return name;
         }
 
-        public void setStart(@NonNull Date start) {
-            this.start = start;
-        }
-
-        public Date getFinish() {
-            return finish;
-        }
-
-        public void setFinish(@NonNull Date finish) {
-            this.finish = finish;
-        }
-
-        @Override
-        public String toString() {
-            DateFormat df = DateUtil.getDefaultDateTimeFormat();
-//            DateFormat  df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-            return "Interval{" +
-                    "start=" + df.format(start) +
-                    ", finish=" + df.format(finish) +
-                    '}';
+        public State setName(String name) {
+            this.name = name;
+            return this;
         }
     }
 }

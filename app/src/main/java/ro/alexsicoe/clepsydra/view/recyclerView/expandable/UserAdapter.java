@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.view.recyclerView.adapter;
+package ro.alexsicoe.clepsydra.view.recyclerView.expandable;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,16 +12,13 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import java.util.List;
 
 import ro.alexsicoe.clepsydra.R;
-import ro.alexsicoe.clepsydra.controller.fragment.UserTaskListFragment;
 import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.model.User;
-import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.TaskViewHolder;
-import ro.alexsicoe.clepsydra.view.recyclerView.viewHolder.UserViewHolder;
 
 public class UserAdapter extends ExpandableRecyclerViewAdapter<UserViewHolder, TaskViewHolder> {
 
     private Context context;
-    private UserTaskListFragment.OnAddTaskCallback onAddTaskCallback;
+    private OnAddTaskCallback onAddTaskCallback;
 
 
     public UserAdapter(List<? extends ExpandableGroup> groups, Context context, UserTaskListFragment.OnAddTaskCallback onAddTaskCallback) {

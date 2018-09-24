@@ -1,4 +1,4 @@
-package ro.alexsicoe.clepsydra.view.recyclerView.viewHolder;
+package ro.alexsicoe.clepsydra.view.recyclerView.expandable;
 
 import android.view.View;
 import android.widget.TextView;
