@@ -58,12 +58,13 @@ public class ProjectListFragment extends Fragment {
     TextView tvEmpty;
     private int columnCount = 1;
     private String userEmail;
+    private List<Project> projects;
+    private ProjectRecyclerViewAdapter adapter;
+
     private Unbinder unbinder;
     private FirebaseFirestore db;
     private CollectionReference projectsRef;
     private CollectionReference userProjectsRef;
-    private List<Project> projects;
-    private ProjectRecyclerViewAdapter adapter;
 
     public static ProjectListFragment newInstance(int columnCount) {
         ProjectListFragment fragment = new ProjectListFragment();

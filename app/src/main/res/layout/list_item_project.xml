@@ -27,7 +27,7 @@
         tools:text="Created by: John Doe" />
 
     <TextView
-        android:id="@+id/tvStartDate"
+        android:id="@+id/tvCreatedAt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

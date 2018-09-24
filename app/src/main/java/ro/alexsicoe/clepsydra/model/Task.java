@@ -157,7 +157,7 @@ public class Task implements Parcelable {
     }
 
 
-    public class TodoItem {
+    public static class TodoItem {
         private String description;
         private boolean isComplete;
 
@@ -186,7 +186,7 @@ public class Task implements Parcelable {
     }
 
 
-    public class Phase {
+    public static class Phase {
         String name;
 
         //TODO count progress bar
