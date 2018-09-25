@@ -25,7 +25,7 @@ public class KanbanFragment extends Fragment {
     private static final String ARG_PROJECT_ID = "param1";
 
     private String projectId;
-    @BindView(R.id.recyclerViewKanban)
+    @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
 
     private Unbinder unbinder;
