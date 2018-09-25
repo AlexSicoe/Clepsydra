@@ -3,29 +3,35 @@ package ro.alexsicoe.clepsydra.controller.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
-import ro.alexsicoe.clepsydra.view.recyclerView.kanbanBoard.CardRecyclerViewAdapter;
+import ro.alexsicoe.clepsydra.view.recyclerView.kanbanBoard.TaskRecyclerViewAdapter;
 
 public class KanbanFragment extends Fragment {
     private static final String ARG_PROJECT_ID = "param1";
 
     private String projectId;
-    private LinkedList<Task> tasks;
+    @BindView(R.id.recyclerViewKanban)
+    RecyclerView recyclerView;
 
     private Unbinder unbinder;
     private FirebaseFirestore db;
-    private CardRecyclerViewAdapter adapter;
+    private List<Task> tasks;
+    private TaskRecyclerViewAdapter adapter;
 
     public KanbanFragment() {
         // Required empty public constructor
@@ -54,10 +60,14 @@ public class KanbanFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         //getAccountDetails(context);
 
+
         db = FirebaseFirestore.getInstance();
-        tasks = new LinkedList<>();
-        adapter = new CardRecyclerViewAdapter(context, tasks, "Titlu");
+        tasks = new ArrayList<>();
+        adapter = new TaskRecyclerViewAdapter(getContext(), tasks);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
         readMockTasks();
+
 
         return view;
     }
@@ -67,12 +77,13 @@ public class KanbanFragment extends Fragment {
     }
 
     private void readMockTasks() {
+        tasks.clear();
         for (int i = 0; i < 5; i++) {
             Task.Phase phase = new Task.Phase("In progress");
             Task task = new Task("000", "Task1", phase);
-            tasks.addLast(task);
+            tasks.add(task);
         }
-        adapter.notifyDataSetChanged();
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
 }

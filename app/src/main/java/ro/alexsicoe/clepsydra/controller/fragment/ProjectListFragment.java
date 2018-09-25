@@ -74,9 +74,6 @@ public class ProjectListFragment extends Fragment {
         return fragment;
     }
 
-    public RecyclerView getRecyclerView() {
-        return recyclerView;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

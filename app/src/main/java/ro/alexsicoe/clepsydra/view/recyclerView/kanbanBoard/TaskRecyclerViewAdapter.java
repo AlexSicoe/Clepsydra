@@ -21,24 +21,17 @@ import butterknife.ButterKnife;
 import ro.alexsicoe.clepsydra.R;
 import ro.alexsicoe.clepsydra.model.Task;
 
-public class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecyclerViewAdapter.ViewHolder> {
-    public static final String TAG = CardRecyclerViewAdapter.class.getSimpleName();
+public class TaskRecyclerViewAdapter extends RecyclerView.Adapter<TaskRecyclerViewAdapter.ViewHolder> {
+    public static final String TAG = TaskRecyclerViewAdapter.class.getSimpleName();
     TextView tvHeader;
     ArrayList<View> extraViews;
     private Context context;
     private List<Task> items;
     private String header;
 
-    public CardRecyclerViewAdapter(Context context, List<Task> items, String header) {
+    public TaskRecyclerViewAdapter(Context context, List<Task> items) {
         this.context = context;
         this.items = items;
-        this.header = header;
-
-//        tvHeader = new TextView(context);
-//        tvHeader.setText(header);
-//
-//        extraViews = new ArrayList<>();
-//        extraViews.add(tvHeader);
     }
 
     @NonNull
@@ -46,9 +39,6 @@ public class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecyclerVi
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_task, parent, false);
-
-//        view.addTouchables(extraViews);
-
         return new ViewHolder(view);
     }
 
@@ -88,7 +78,10 @@ public class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecyclerVi
             tvTaskName.setText(name);
             tvTaskDescription.setText(description);
 
-            cardView.addView(tvTaskName); //
+
+            Toast.makeText(context, "been here", Toast.LENGTH_SHORT).show();
+
+            cardView.addView(tvTaskName); //FIXME
             cardView.addView(tvTaskDescription);
 
 
@@ -101,15 +94,6 @@ public class CardRecyclerViewAdapter extends RecyclerView.Adapter<CardRecyclerVi
                 return true;
             });
 
-            itemView.setOnDragListener((v, event) -> {
-                Toast.makeText(context, "DRAG", Toast.LENGTH_SHORT).show();
-                return false;
-            });
-
-            itemView.setOnHoverListener((v, event) -> {
-                Toast.makeText(context, "HOVER", Toast.LENGTH_SHORT).show();
-                return false;
-            });
         }
     }
 }
