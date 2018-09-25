@@ -80,7 +80,7 @@ public class KanbanFragment extends Fragment {
         tasks.clear();
         for (int i = 0; i < 5; i++) {
             Task.Phase phase = new Task.Phase("In progress");
-            Task task = new Task("000", "Task1", phase);
+            Task task = new Task("000", "Task1", phase).setDescription(getResources().getString(R.string.lorem_ipsum));
             tasks.add(task);
         }
         recyclerView.getAdapter().notifyDataSetChanged();

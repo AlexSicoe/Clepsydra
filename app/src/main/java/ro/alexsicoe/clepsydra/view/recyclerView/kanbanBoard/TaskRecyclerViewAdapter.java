@@ -79,12 +79,6 @@ public class TaskRecyclerViewAdapter extends RecyclerView.Adapter<TaskRecyclerVi
             tvTaskDescription.setText(description);
 
 
-            Toast.makeText(context, "been here", Toast.LENGTH_SHORT).show();
-
-            cardView.addView(tvTaskName); //FIXME
-            cardView.addView(tvTaskDescription);
-
-
             itemView.setOnClickListener(v -> {
                 Toast.makeText(context, id, Toast.LENGTH_SHORT).show();
             });
