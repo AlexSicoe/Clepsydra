@@ -112,7 +112,7 @@ public class Project implements Serializable {
         return Objects.hash(id);
     }
 
-    public static class Phase {
+    public static class Phase implements Serializable {
         String name;
 
         //TODO count progress bar
@@ -132,6 +132,13 @@ public class Project implements Serializable {
         public Phase setName(String name) {
             this.name = name;
             return this;
+        }
+
+        @Override
+        public String toString() {
+            return "Phase{" +
+                    "name='" + name + '\'' +
+                    '}';
         }
     }
 }

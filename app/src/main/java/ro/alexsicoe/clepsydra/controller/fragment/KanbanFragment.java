@@ -2,6 +2,7 @@ package ro.alexsicoe.clepsydra.controller.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.allyants.boardview.BoardView;
 import com.allyants.boardview.SimpleBoardAdapter;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -27,26 +29,27 @@ import ro.alexsicoe.clepsydra.view.recyclerView.kanbanBoard.TaskRecyclerViewAdap
 
 public class KanbanFragment extends Fragment {
     private final static String TAG = KanbanFragment.class.getSimpleName();
-    private static final String ARG_PROJECT_ID = "projectId";
+    private static final String ARG_CURRENT_PROJECT = "projectId";
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.boardView)
     BoardView boardView;
 
-    private String projectId;
+    private Project currentProject;
     private Unbinder unbinder;
     private FirebaseFirestore db;
     private List<Task> tasks;
     private TaskRecyclerViewAdapter adapter;
+    private CollectionReference tasksRef;
 
     public KanbanFragment() {
         // Required empty public constructor
     }
 
-    public static KanbanFragment newInstance(String projectId) {
+    public static KanbanFragment newInstance(Project currentProject) {
         KanbanFragment fragment = new KanbanFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PROJECT_ID, projectId);
+        args.putSerializable(ARG_CURRENT_PROJECT, currentProject);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,7 +58,7 @@ public class KanbanFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            projectId = getArguments().getString(ARG_PROJECT_ID);
+            currentProject = (Project) getArguments().getSerializable(ARG_CURRENT_PROJECT);
         }
     }
 
@@ -66,29 +69,30 @@ public class KanbanFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         //getAccountDetails(context);
 
-
         db = FirebaseFirestore.getInstance();
+        tasksRef = db
+                .collection("Projects").document(currentProject.getId())
+                .collection("Tasks");
+
         tasks = new ArrayList<>();
         adapter = new TaskRecyclerViewAdapter(getContext(), tasks);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 //        recyclerView.setAdapter(adapter);
 //        readMockTasks();
 
-        mockBoard();
+        setupBoard();
 
         return view;
     }
 
-    private void mockBoard() {
-        List<Project.Phase> mockPhases = new ArrayList<>();
-        mockPhases.add(new Project.Phase("Todo"));
-        mockPhases.add(new Project.Phase("In progress"));
-        mockPhases.add(new Project.Phase("Done"));
+    private void setupBoard() {
+//        List<Project.Phase> phases = readMockPhases();
+        List<Project.Phase> phases = readProjectPhases();
+        readMockTasks(phases);
 
 
         ArrayList<SimpleBoardAdapter.SimpleColumn> data = new ArrayList<>();
-        List<Task> tasks = readMockTasks(mockPhases);
-        for (Project.Phase phase : mockPhases) {
+        for (Project.Phase phase : phases) {
             ArrayList<Object> columnData = new ArrayList<>();
             for (Task task : tasks) {
                 if (task.getPhase() == phase) {
@@ -98,14 +102,20 @@ public class KanbanFragment extends Fragment {
             data.add(new SimpleBoardAdapter.SimpleColumn(phase.getName(), columnData));
         }
 
+
         SimpleBoardAdapter boardAdapter = new SimpleBoardAdapter(getContext(), data);
         boardView.setAdapter(boardAdapter);
 
+        boardView.setOnItemClickListener(new BoardView.ItemClickListener() {
+            @Override
+            public void onClick(View view, int column_pos, int item_pos) {
+                Log.d(TAG, "onClick() called with: view = [" + view + "], column_pos = [" + column_pos + "], item_pos = [" + item_pos + "]");
+            }
+        });
 
         boardView.setOnDragColumnListener(new BoardView.DragColumnStartCallback() {
             @Override
             public void startDrag(View view, int startColumnPos) {
-                Log.d(TAG, "startDrag() called with: view = [" + view + "], startColumnPos = [" + startColumnPos + "]");
             }
 
             @Override
@@ -127,11 +137,13 @@ public class KanbanFragment extends Fragment {
         boardView.setOnDragItemListener(new BoardView.DragItemStartCallback() {
             @Override
             public void startDrag(View view, int startItemPos, int startColumnPos) {
+//                FIXME buggy parameters^
                 Log.d(TAG, "startDrag() called with: view = [" + view + "], startItemPos = [" + startItemPos + "], startColumnPos = [" + startColumnPos + "]");
             }
 
             @Override
             public void changedPosition(View view, int startItemPos, int startColumnPos, int newItemPos, int newColumnPos) {
+                Log.d(TAG, "changedPosition() called with: view = [" + view + "], startItemPos = [" + startItemPos + "], startColumnPos = [" + startColumnPos + "], newItemPos = [" + newItemPos + "], newColumnPos = [" + newColumnPos + "]");
 
             }
 
@@ -141,20 +153,34 @@ public class KanbanFragment extends Fragment {
             }
 
             @Override
-            public void endDrag(View view, int startItemPos, int startColumnPos, int endItemPos, int endColumnPos) {
+            public void endDrag(View view, int startColumnPos, int startItemPos, int endItemPos, int endColumnPos) {
+                //TODO am inversat startColumnPos cu startItemPos. why tho?
                 Log.d(TAG, "endDrag() called with: view = [" + view + "], startItemPos = [" + startItemPos
                         + "], startColumnPos = [" + startColumnPos + "], endItemPos = [" + endItemPos + "], endColumnPos = [" + endColumnPos + "]");
             }
         });
     }
 
+    private List<Project.Phase> readProjectPhases() {
+        return currentProject.getPhases();
+    }
+
     private void readTasks() {
         //TODO
     }
 
+    @NonNull
+    private List<Project.Phase> readMockPhases() {
+        List<Project.Phase> mockPhases = new ArrayList<>();
+        mockPhases.add(new Project.Phase("Todo"));
+        mockPhases.add(new Project.Phase("In progress"));
+        mockPhases.add(new Project.Phase("Done"));
+        return mockPhases;
+    }
 
-    private List<Task> readMockTasks(List<Project.Phase> phases) {
-        List<Task> tasks = new ArrayList<>();
+
+    private void readMockTasks(List<Project.Phase> phases) {
+        tasks.clear();
         for (int i = 0; i < 3; i++) {
             Task task = new Task("000", "TaskA" + i + 1, phases.get(0)).setDescription(getResources().getString(R.string.lorem_ipsum));
             tasks.add(task);
@@ -168,7 +194,6 @@ public class KanbanFragment extends Fragment {
             tasks.add(task);
         }
 //        recyclerView.getAdapter().notifyDataSetChanged();
-        return tasks;
     }
 
 }

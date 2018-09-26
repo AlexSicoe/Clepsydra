@@ -71,7 +71,7 @@ public class ProjectActivity extends AppCompatActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.root_layout, KanbanFragment.newInstance(projectId), "KanbanFragment")
+                .add(R.id.root_layout, KanbanFragment.newInstance(project), "KanbanFragment")
                 .commit();
 
         View headerView = navView.getHeaderView(0);
