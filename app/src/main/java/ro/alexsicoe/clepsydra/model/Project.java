@@ -1,9 +1,12 @@
 package ro.alexsicoe.clepsydra.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class Project implements Serializable {
@@ -15,6 +18,8 @@ public class Project implements Serializable {
     private String createdBy;
     @NonNull
     private Date createdAt;
+    @Nullable
+    private List<Phase> phases;
     //private List<Milestone> milestones;
     //private List<User> users;
 
@@ -26,6 +31,11 @@ public class Project implements Serializable {
         this.name = name;
         this.createdBy = createdBy;
         this.createdAt = new Date();
+        //TODO factory
+        this.phases = new ArrayList<>();
+        phases.add(new Phase("Todo"));
+        phases.add(new Phase("In progress"));
+        phases.add(new Phase("Done"));
     }
 
     @NonNull
@@ -68,6 +78,16 @@ public class Project implements Serializable {
         return this;
     }
 
+    @Nullable
+    public List<Phase> getPhases() {
+        return phases;
+    }
+
+    public Project setPhases(@Nullable List<Phase> phases) {
+        this.phases = phases;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "Project{" +
@@ -75,6 +95,7 @@ public class Project implements Serializable {
                 ", name='" + name + '\'' +
                 ", createdBy='" + createdBy + '\'' +
                 ", createdAt=" + createdAt +
+                ", phases=" + phases +
                 '}';
     }
 
@@ -89,5 +110,28 @@ public class Project implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public static class Phase {
+        String name;
+
+        //TODO count progress bar
+
+        public Phase() {
+
+        }
+
+        public Phase(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Phase setName(String name) {
+            this.name = name;
+            return this;
+        }
     }
 }

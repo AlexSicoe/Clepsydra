@@ -6,10 +6,16 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
+    <com.allyants.boardview.BoardView
+        android:id="@+id/boardView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></com.allyants.boardview.BoardView>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 
 </LinearLayout>
 

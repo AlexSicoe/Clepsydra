@@ -41,10 +41,10 @@ public class Task implements Parcelable {
     }
 
     @NonNull
-    private Phase phase;
+    private Project.Phase phase;
 
 
-    public Task(@NonNull String id, @NonNull String name, @NonNull Phase phase) {
+    public Task(@NonNull String id, @NonNull String name, @NonNull Project.Phase phase) {
         this.id = id;
         this.name = name;
         this.phase = phase;
@@ -69,11 +69,11 @@ public class Task implements Parcelable {
     }
 
     @NonNull
-    public Phase getPhase() {
+    public Project.Phase getPhase() {
         return phase;
     }
 
-    public Task setPhase(@NonNull Phase phase) {
+    public Task setPhase(@NonNull Project.Phase phase) {
         this.phase = phase;
         return this;
     }
@@ -139,6 +139,11 @@ public class Task implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
     public int hashCode() {
         return id.hashCode();
     }
@@ -186,26 +191,5 @@ public class Task implements Parcelable {
     }
 
 
-    public static class Phase {
-        String name;
 
-        //TODO count progress bar
-
-        public Phase() {
-
-        }
-
-        public Phase(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Phase setName(String name) {
-            this.name = name;
-            return this;
-        }
-    }
 }

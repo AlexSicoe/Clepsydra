@@ -3,12 +3,15 @@ package ro.alexsicoe.clepsydra.controller.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.allyants.boardview.BoardView;
+import com.allyants.boardview.SimpleBoardAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -18,16 +21,19 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ro.alexsicoe.clepsydra.R;
+import ro.alexsicoe.clepsydra.model.Project;
 import ro.alexsicoe.clepsydra.model.Task;
 import ro.alexsicoe.clepsydra.view.recyclerView.kanbanBoard.TaskRecyclerViewAdapter;
 
 public class KanbanFragment extends Fragment {
-    private static final String ARG_PROJECT_ID = "param1";
-
-    private String projectId;
+    private final static String TAG = KanbanFragment.class.getSimpleName();
+    private static final String ARG_PROJECT_ID = "projectId";
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.boardView)
+    BoardView boardView;
 
+    private String projectId;
     private Unbinder unbinder;
     private FirebaseFirestore db;
     private List<Task> tasks;
@@ -64,26 +70,105 @@ public class KanbanFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         tasks = new ArrayList<>();
         adapter = new TaskRecyclerViewAdapter(getContext(), tasks);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(adapter);
-        readMockTasks();
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        recyclerView.setAdapter(adapter);
+//        readMockTasks();
 
+        mockBoard();
 
         return view;
+    }
+
+    private void mockBoard() {
+        List<Project.Phase> mockPhases = new ArrayList<>();
+        mockPhases.add(new Project.Phase("Todo"));
+        mockPhases.add(new Project.Phase("In progress"));
+        mockPhases.add(new Project.Phase("Done"));
+
+
+        ArrayList<SimpleBoardAdapter.SimpleColumn> data = new ArrayList<>();
+        List<Task> tasks = readMockTasks(mockPhases);
+        for (Project.Phase phase : mockPhases) {
+            ArrayList<Object> columnData = new ArrayList<>();
+            for (Task task : tasks) {
+                if (task.getPhase() == phase) {
+                    columnData.add(task);
+                }
+            }
+            data.add(new SimpleBoardAdapter.SimpleColumn(phase.getName(), columnData));
+        }
+
+        SimpleBoardAdapter boardAdapter = new SimpleBoardAdapter(getContext(), data);
+        boardView.setAdapter(boardAdapter);
+
+
+        boardView.setOnDragColumnListener(new BoardView.DragColumnStartCallback() {
+            @Override
+            public void startDrag(View view, int startColumnPos) {
+                Log.d(TAG, "startDrag() called with: view = [" + view + "], startColumnPos = [" + startColumnPos + "]");
+            }
+
+            @Override
+            public void changedPosition(View view, int startColumnPos, int newColumnPos) {
+
+            }
+
+            @Override
+            public void dragging(View itemView, MotionEvent event) {
+
+            }
+
+            @Override
+            public void endDrag(View view, int startColumnPos, int endColumnPos) {
+                Log.d(TAG, "endDrag() called with: view = [" + view + "], startColumnPos = [" + startColumnPos + "], endColumnPos = [" + endColumnPos + "]");
+            }
+        });
+
+        boardView.setOnDragItemListener(new BoardView.DragItemStartCallback() {
+            @Override
+            public void startDrag(View view, int startItemPos, int startColumnPos) {
+                Log.d(TAG, "startDrag() called with: view = [" + view + "], startItemPos = [" + startItemPos + "], startColumnPos = [" + startColumnPos + "]");
+            }
+
+            @Override
+            public void changedPosition(View view, int startItemPos, int startColumnPos, int newItemPos, int newColumnPos) {
+
+            }
+
+            @Override
+            public void dragging(View itemView, MotionEvent event) {
+
+            }
+
+            @Override
+            public void endDrag(View view, int startItemPos, int startColumnPos, int endItemPos, int endColumnPos) {
+                Log.d(TAG, "endDrag() called with: view = [" + view + "], startItemPos = [" + startItemPos
+                        + "], startColumnPos = [" + startColumnPos + "], endItemPos = [" + endItemPos + "], endColumnPos = [" + endColumnPos + "]");
+            }
+        });
     }
 
     private void readTasks() {
         //TODO
     }
 
-    private void readMockTasks() {
-        tasks.clear();
-        for (int i = 0; i < 5; i++) {
-            Task.Phase phase = new Task.Phase("In progress");
-            Task task = new Task("000", "Task1", phase).setDescription(getResources().getString(R.string.lorem_ipsum));
+
+    private List<Task> readMockTasks(List<Project.Phase> phases) {
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            Task task = new Task("000", "TaskA" + i + 1, phases.get(0)).setDescription(getResources().getString(R.string.lorem_ipsum));
             tasks.add(task);
         }
-        recyclerView.getAdapter().notifyDataSetChanged();
+        for (int i = 0; i < 5; i++) {
+            Task task = new Task("001", "TaskB" + i + 1, phases.get(1)).setDescription(getResources().getString(R.string.lorem_ipsum));
+            tasks.add(task);
+        }
+        for (int i = 0; i < 2; i++) {
+            Task task = new Task("002", "TaskC" + i + 1, phases.get(2)).setDescription(getResources().getString(R.string.lorem_ipsum));
+            tasks.add(task);
+        }
+//        recyclerView.getAdapter().notifyDataSetChanged();
+        return tasks;
     }
 
 }
